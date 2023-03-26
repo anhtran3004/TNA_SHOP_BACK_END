@@ -1,7 +1,11 @@
 const Joi = require('joi');
 const express = require('express');
+const bodyParser = require('body-parser');
+
+const db = require('./database');
 const app = express();
 app.use(express.json());
+app.use(bodyParser.json());
 const courses = [
     {id: 1, name:"PHP"},
     {id: 2, name:"Java"},
@@ -77,3 +81,26 @@ app.delete("/api/courses/:id", (req, res)=>{
     courses.splice(indexDelete, 1);
     res.send(courses);
 })
+app.get('/users', (req, res) => {
+    db.query('SELECT * FROM users', (error, results) => {
+      if (error) {
+        console.log('Error fetching users from MySQL database', error);
+        res.status(500).json({ error: 'Error fetching users from MySQL database' });
+      } else {
+        res.json(results);
+      }
+    });
+  });
+  
+  app.post('/users', (req, res) => {
+    const { name, email } = req.body;
+  
+    db.query('INSERT INTO users (last_name, email) VALUES (?, ?)', [name, email], (error, results) => {
+      if (error) {
+        console.log('Error inserting user into MySQL database', error);
+        res.status(500).json({ error: 'Error inserting user into MySQL database' });
+      } else {
+        res.json({ id: results.insertId, name, email });
+      }
+    });
+  });
