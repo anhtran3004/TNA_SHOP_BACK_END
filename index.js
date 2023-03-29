@@ -9,10 +9,6 @@ app.use('/api/v1/product', product);
 app.use('/api/v1/learn',learn );
 // PORT server
 const port = process.env.PORT || 3000;
-app.listen(port, () =>{
-    console.log(`Server run port ${port}...`);
-})
-
 app.get('/users', (req, res) => {
     db.query('SELECT * FROM users', (error, results) => {
       if (error) {
@@ -35,3 +31,7 @@ app.get('/users', (req, res) => {
       }
     });
   });
+app.listen(port, () =>{
+    console.log(`Server run port ${port}...`);
+})
+

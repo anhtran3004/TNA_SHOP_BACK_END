@@ -56,8 +56,8 @@ router.post('/insert-product', (req, res) =>{
         }
     }) 
 })
-router.post('edit-product', (req, res) =>{
-    const {product_input} = req.body; 
-})
-router.put()
+// router.post('edit-product', (req, res) =>{
+//     const {product_input} = req.body; 
+// })
+// router.put()
 module.exports = router;
