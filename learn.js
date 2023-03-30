@@ -75,4 +75,26 @@ function validateCourse(course){
     }
     return Joi.validate(course, schema);
 }
+router.get('/users', (req, res) => {
+    db.query('SELECT * FROM users', (error, results) => {
+      if (error) {
+        console.log('Error fetching users from MySQL database', error);
+        res.status(500).json({ error: 'Error fetching users from MySQL database' });
+      } else {
+        res.json(results);
+      }
+    });
+  });
+  
+  router.post('/users', (req, res) => {
+    const { name, email } = req.body;
+    db.query('INSERT INTO users (last_name, email) VALUES (?, ?)', [name, email], (error, results) => {
+      if (error) {
+        console.log('Error inserting user into MySQL database', error);
+        res.status(500).json({ error: 'Error inserting user into MySQL database' });
+      } else {
+        res.json({ id: results.insertId, name, email });
+      }
+    });
+  });
 module.exports = router;

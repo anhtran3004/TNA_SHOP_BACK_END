@@ -40,10 +40,10 @@ router.post('/', (req, res) =>{
 })
 router.post('/insert-product', (req, res) =>{
     const {product_input} = req.body; 
-    let sql = 'INSERT INTO products (name, price, description, thumb, category_id, status, hot, campain_id, discount_id, quantiy_of_inventory, start_import) VALUES';
+    let sql = 'INSERT INTO products (name, price, description, thumb, category_id, status, hot, discount_id, campain_id, quantity_of_inventory, import_date, update_date,favorite) VALUES';
     if(product_input){
         sql+= ` ("${product_input.name}", ${product_input.price}, "${product_input.desc}", "${product_input.thumb}", ${product_input.category_id}, ${product_input.status}, ${product_input.hot},
-        ${product_input.campain_id}, ${product_input.discount_id}, ${product_input.quantity_of_inventory}, "${product_input.start_import}")`;
+         ${product_input.discount_id}, ${product_input.campain_id}, ${product_input.quantity_of_inventory}, "${product_input.import_date}", "${product_input.update_date}", ${product_input.favorite})`;
     }
     console.log(sql);
     // execute query
@@ -56,8 +56,24 @@ router.post('/insert-product', (req, res) =>{
         }
     }) 
 })
-// router.post('edit-product', (req, res) =>{
-//     const {product_input} = req.body; 
-// })
-// router.put()
+router.put('/edit-product/:id', (req, res) => {
+    const {product_input} = req.body;
+    const id = req.params.id;
+    const sql = `UPDATE products SET name = ?, price = ?, description = ?, thumb = ?, category_id = ?, status = ?, hot = ?, discount_id = ?, campain_id = ?, quantity_of_inventory = ?, import_date = ?, update_date = ?,favorite = ? WHERE id = ?`;
+    
+    // execute query
+    db.query(sql,[product_input.name, product_input.price, product_input.desc, product_input.category_id, product_input.status, product_input.hot,
+    product_input.discount_id, product_input.campain_id, product_input.quantity_of_inventory, product_input.import_date, product_input.update_date,
+    product_input.favorite, id], (error,  results) => {
+        if (error) {
+            res.status(500).send({ error: 'Error updating product' });
+            console.log(sql);
+        } else if (results.affectedRows === 0) {
+            res.status(404).send({ error: `Product with ID ${id} not found` });
+        } else {
+            res.send({ message: `Product with ID ${id} updated successfully` });
+            console.log(sql);
+        }
+    }) 
+})
 module.exports = router;
