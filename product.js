@@ -1,15 +1,11 @@
 const express = require('express')
 const db = require('./database')
 const router = express.Router()
-const moment = require('moment-timezone');
-const { error } = require('joi/lib/types/lazy');
-const now = moment();
-const nowInUtcPlus7 = now.tz('Asia/Ho_Chi_Minh');
 router.post('/', (req, res) =>{
     const {filter, sort, pagination} = req.body;
     let sql = 'SELECT * FROM products WHERE 1=1';
 
-    // apply filters
+    // apply filters    
     if(filter){
         // if(filter.gender_type){
         //     sql += ` WHERE gender_type = '${filter.gender_type}'`
@@ -38,7 +34,7 @@ router.post('/', (req, res) =>{
         if(error){
             res.status(500).send({error: 'Error fetching products form database'});
         }else{
-            res.send(results);
+            res.status(200).send({code: 200, message: "success!", data: results});
         }
     }) 
 })
@@ -47,9 +43,9 @@ router.post('/insert-product', (req, res) =>{
     let sql = 'INSERT INTO products (name, price, description, thumb, category_id, status, hot, discount_id, campain_id, quantity_of_inventory, import_date, update_date,favorite) VALUES';
     if(product_input){
         sql+= ` ("${product_input.name}", ${product_input.price}, "${product_input.desc}", "${product_input.thumb}", ${product_input.category_id}, ${product_input.status}, ${product_input.hot},
-         ${product_input.discount_id}, ${product_input.campain_id}, ${product_input.quantity_of_inventory}, "${product_input.import_date}", "${product_input.update_date}", ${product_input.favorite})`;
+         ${product_input.discount_id}, ${product_input.campain_id}, ${product_input.quantity_of_inventory}, ${new Date()},  ${new Date()}, ${product_input.favorite})`;
     }
-    console.log(sql);
+    console.log(sql);   
     // execute query
     db.query(sql, (error,  results) => {
         if(error){
