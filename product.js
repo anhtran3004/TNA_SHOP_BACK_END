@@ -1,6 +1,10 @@
 const express = require('express')
 const db = require('./database')
 const router = express.Router()
+const moment = require('moment-timezone');
+const { error } = require('joi/lib/types/lazy');
+const now = moment();
+const nowInUtcPlus7 = now.tz('Asia/Ho_Chi_Minh');
 router.post('/', (req, res) =>{
     const {filter, sort, pagination} = req.body;
     let sql = 'SELECT * FROM products WHERE 1=1';
@@ -59,21 +63,40 @@ router.post('/insert-product', (req, res) =>{
 router.put('/edit-product/:id', (req, res) => {
     const {product_input} = req.body;
     const id = req.params.id;
-    const sql = `UPDATE products SET name = ?, price = ?, description = ?, thumb = ?, category_id = ?, status = ?, hot = ?, discount_id = ?, campain_id = ?, quantity_of_inventory = ?, import_date = ?, update_date = ?,favorite = ? WHERE id = ?`;
+    const sql = `UPDATE products SET name = ?, price = ?, description = ?, thumb = ?, category_id = ?, status = ?, hot = ?, discount_id = ?, campain_id = ?, quantity_of_inventory = ?, update_date = ?,favorite = ? WHERE id = ?`;
     
     // execute query
-    db.query(sql,[product_input.name, product_input.price, product_input.desc, product_input.category_id, product_input.status, product_input.hot,
-    product_input.discount_id, product_input.campain_id, product_input.quantity_of_inventory, product_input.import_date, product_input.update_date,
+    db.query(sql,[product_input.name, product_input.price, product_input.desc, product_input.thumb, product_input.category_id, product_input.status, product_input.hot,
+    product_input.discount_id, product_input.campain_id, product_input.quantity_of_inventory, new Date(),
     product_input.favorite, id], (error,  results) => {
         if (error) {
             res.status(500).send({ error: 'Error updating product' });
             console.log(sql);
+            console.log("product name", product_input.name);
         } else if (results.affectedRows === 0) {
             res.status(404).send({ error: `Product with ID ${id} not found` });
         } else {
-            res.send({ message: `Product with ID ${id} updated successfully` });
+            res.send({ code: 200, message: `Product with ID ${id} updated successfully` });
             console.log(sql);
+            console.log("product name", product_input.name);
+            
         }
     }) 
+})
+router.put('/delete-product', (req, res) =>{
+    const ids = req.body.ids; 
+    if(!ids || !Array.isArray(ids)){
+        res.status(400).send({code: 400, message:"Invalid request body"});
+        return
+    }
+    const sql = `UPDATE products SET status = 0 WHERE id IN (?)`; // sử dụng tham số IN để xóa nhiều sản phẩm
+    db.query(sql, [ids], (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error deleting products'});
+        }else{
+            res.send({code: 200, message: `Deleted ${results.affectedRows} products`});
+        }
+    })
+
 })
 module.exports = router;
