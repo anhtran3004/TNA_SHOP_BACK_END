@@ -3,7 +3,7 @@ const db = require('./database')
 const router = express.Router()
 router.post('/', (req, res) =>{
     const {filter, sort, pagination} = req.body;
-    let sql = 'SELECT * FROM products WHERE 1=1';
+    let sql = 'SELECT * FROM products WHERE status = 1 AND 1=1';
 
     // apply filters    
     if(filter){
