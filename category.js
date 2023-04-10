@@ -19,7 +19,7 @@ router.get('/', (req, res) =>{
 router.post('/insert-category', (req, res)=>{
     const {category_input} = req.body;
     if(!category_input){
-        res.status(400).send({code: 400, message:"invalid input value"})
+        res.status(400).json({code: 400, message:"invalid input value"})
     }
     let sql = 'INSERT INTO categories (categoryName, sku, status) VALUES';
     if(category_input){
@@ -28,9 +28,9 @@ router.post('/insert-category', (req, res)=>{
     console.log(sql);
     db.query(sql, (error, results) =>{
         if(error){
-            res.status(500).send({code: 500, message:"error insert category"})
+            res.status(500).json({code: 500, message:"error insert category"})
         }else{
-            res.status(200).send({code: 200, message:"insert success!"});
+            res.status(200).json({code: 200, message:"insert success!"});
         }
     })
 })
