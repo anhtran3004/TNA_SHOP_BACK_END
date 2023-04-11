@@ -5,7 +5,7 @@ function generateSKU(name){
     const sku = name.replace(/\s+/g, "-");
     return sku;
 }
-router.get('/', (req, res) =>{
+router.post('/', (req, res) =>{
     // const {category_input} = req.body.product_input;
     const sql = 'SELECT * FROM categories';
     db.query(sql, (error, results) =>{

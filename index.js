@@ -27,7 +27,7 @@ app.use('/api/v1/product-image', productImage);
 app.use('/api/v1/color', color);
 app.use('/api/v1/auth', auth);
 // PORT server
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 app.listen(port, () =>{
     console.log(`Server run port ${port}...`);
