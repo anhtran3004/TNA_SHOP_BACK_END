@@ -95,4 +95,16 @@ router.put('/delete-product', (req, res) =>{
     })
 
 })
+router.post('/get-quantity-of-inventory', (req, res) =>{
+    const {product_id} = req.body;
+    sql = `SELECT * FROM product_information join sizes on product_information.size_id = sizes.id join colors on colors.id = product_information.color_id where product_id = ${product_id}`
+    console.log(sql);
+    db.query(sql, (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error get inventory products'});
+        }else{
+            res.send({code: 200, message: `Get ${results.affectedRows} products`, data: results});
+        }
+    })
+})
 module.exports = router;

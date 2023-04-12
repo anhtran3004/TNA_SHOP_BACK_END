@@ -1,6 +1,10 @@
 
 const express = require('express');
-const db = require('./database');
+const app = express();
+const bodyParser = require('body-parser');
+// Sử dụng body-parser middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 const product = require('./product');
 const category = require('./category');
 const size = require('./size');
@@ -8,7 +12,7 @@ const productImage = require('./product-image');
 const color = require('./color');
 const learn = require('./learn');
 const auth = require('./auth');
-const app = express();
+
 const cors=require("cors");
 const corsOptions ={
    origin:'*', 
