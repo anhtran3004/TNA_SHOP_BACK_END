@@ -28,7 +28,7 @@ router.post('/', (req, res) =>{
     const perPage = (pagination && pagination.perPage) ? pagination.perPage : 10;
     const startIndex = page * perPage;
     sql += ` LIMIT ${startIndex}, ${perPage}`;
-    console.log("sql", sql);
+    // console.log("sql", sql);
     // execute query
     db.query(sql, (error,  results) => {
         if(error){
