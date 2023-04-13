@@ -1,6 +1,14 @@
 const express = require('express')
 const db = require('./database')
 const router = express.Router()
+function formatDate(){
+    const dateObj = new Date();
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+}
 router.post('/', (req, res) =>{
     const {filter, sort, pagination} = req.body;
     let sql = 'SELECT * FROM products WHERE status = 1 AND 1=1';
@@ -40,10 +48,10 @@ router.post('/', (req, res) =>{
 })
 router.post('/insert-product', (req, res) =>{
     const {product_input} = req.body; 
-    let sql = 'INSERT INTO products (name, price, description, thumb, category_id, status, hot, discount_id, campain_id, quantity_of_inventory, import_date, update_date,favorite) VALUES';
+    let sql = 'INSERT INTO products (name, price, description, thumb, category_id, hot, discount_id, campain_id, import_date, update_date, priority) VALUES';
     if(product_input){
-        sql+= ` ("${product_input.name}", ${product_input.price}, "${product_input.desc}", "${product_input.thumb}", ${product_input.category_id}, ${product_input.status}, ${product_input.hot},
-         ${product_input.discount_id}, ${product_input.campain_id}, ${product_input.quantity_of_inventory}, ${new Date()},  ${new Date()}, ${product_input.favorite})`;
+        sql+= ` ("${product_input.name}", ${product_input.price}, "${product_input.description}", "${product_input.thumb}", ${product_input.category_id}, ${product_input.hot},
+         ${product_input.discount_id}, ${product_input.campaign_id}, "${formatDate()}",  "${formatDate()}", ${product_input.priority})`;
     }
     console.log(sql);   
     // execute query
