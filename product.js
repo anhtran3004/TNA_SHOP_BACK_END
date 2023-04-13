@@ -59,22 +59,23 @@ router.post('/insert-product', (req, res) =>{
 router.put('/edit-product/:id', (req, res) => {
     const {product_input} = req.body;
     const id = req.params.id;
-    const sql = `UPDATE products SET name = ?, price = ?, description = ?, thumb = ?, category_id = ?, status = ?, hot = ?, discount_id = ?, campain_id = ?, quantity_of_inventory = ?, update_date = ?,favorite = ? WHERE id = ?`;
+    const sql = `UPDATE products SET name = ?, price = ?, description = ?, thumb = ?, category_id = ?, hot = ?, discount_id = ?, campain_id = ?, update_date = ?, priority = ? WHERE id = ?`;
     
     // execute query
-    db.query(sql,[product_input.name, product_input.price, product_input.desc, product_input.thumb, product_input.category_id, product_input.status, product_input.hot,
-    product_input.discount_id, product_input.campain_id, product_input.quantity_of_inventory, new Date(),
-    product_input.favorite, id], (error,  results) => {
+    db.query(sql,[product_input.name, product_input.price, product_input.description, product_input.thumb, product_input.category_id, product_input.hot,
+    product_input.discount_id, product_input.campain_id, new Date(), product_input.priority,
+    id], (error,  results) => {
         if (error) {
             res.status(500).send({ error: 'Error updating product' });
             console.log(sql);
-            console.log("product name", product_input.name);
+            console.log("product name", product_input.description);
         } else if (results.affectedRows === 0) {
             res.status(404).send({ error: `Product with ID ${id} not found` });
+            console.log(sql);
         } else {
             res.send({ code: 200, message: `Product with ID ${id} updated successfully` });
             console.log(sql);
-            console.log("product name", product_input.name);
+            console.log("product name", product_input.description);
             
         }
     }) 
@@ -83,16 +84,18 @@ router.put('/delete-product', (req, res) =>{
     const ids = req.body.ids; 
     if(!ids || !Array.isArray(ids)){
         res.status(400).send({code: 400, message:"Invalid request body"});
-        return
+        // return
     }
     const sql = `UPDATE products SET status = 0 WHERE id IN (?)`; // sử dụng tham số IN để xóa nhiều sản phẩm
     db.query(sql, [ids], (error, results) => {
         if(error){
             res.status(500).send({code: 500, message:'Error deleting products'});
+            console.log(sql);
         }else{
             res.send({code: 200, message: `Deleted ${results.affectedRows} products`});
         }
     })
+
 
 })
 router.post('/get-quantity-of-inventory', (req, res) =>{
@@ -105,6 +108,19 @@ router.post('/get-quantity-of-inventory', (req, res) =>{
         }else{
             res.send({code: 200, message: `Get ${results.affectedRows} products`, data: results});
         }
+    })
+})
+router.post('/get-quantity-of-inventory/:id', (req, res) =>{
+    const product_id = req.params.id;
+    sql = `SELECT * FROM product_information join sizes on product_information.size_id = sizes.id join colors on colors.id = product_information.color_id where product_id = ${product_id}`
+    console.log(sql);
+    db.query(sql, (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error get inventory products'});
+        }else{
+            res.send({code: 200, message: `Get ${results.affectedRows} products`, data: results});
+        }
+
     })
 })
 module.exports = router;
