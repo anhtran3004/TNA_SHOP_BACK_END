@@ -17,7 +17,7 @@ router.post('/insert-size', (req, res)=>{
         }
     })
 });
-router.post('/delete-size', (req, res) =>{
+router.put('/delete-size', (req, res) =>{
     const ids = req.body.ids;
     if(!ids || !Array.isArray(ids)){
         res.status(400).send({code: 400, message:"Invalid request body"});
@@ -47,7 +47,7 @@ router.put('/update-size/:id', (req, res) =>{
     })
 })
 router.post('/', (req, res) =>{
-    let sql = `SELECT * FROM  sizes`;
+    let sql = `SELECT * FROM  sizes WHERE status = 1`;
     console.log(sql);
     db.query(sql, (error, results) => {
         if(error){
