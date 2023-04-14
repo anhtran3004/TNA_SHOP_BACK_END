@@ -106,21 +106,9 @@ router.put('/delete-product', (req, res) =>{
 
 
 })
-router.post('/get-quantity-of-inventory', (req, res) =>{
-    const {product_id} = req.body;
-    sql = `SELECT * FROM product_information join sizes on product_information.size_id = sizes.id join colors on colors.id = product_information.color_id where product_id = ${product_id}`
-    console.log(sql);
-    db.query(sql, (error, results) => {
-        if(error){
-            res.status(500).send({code: 500, message:'Error get inventory products'});
-        }else{
-            res.send({code: 200, message: `Get ${results.affectedRows} products`, data: results});
-        }
-    })
-})
 router.post('/get-quantity-of-inventory/:id', (req, res) =>{
     const product_id = req.params.id;
-    sql = `SELECT * FROM product_information join sizes on product_information.size_id = sizes.id join colors on colors.id = product_information.color_id where product_id = ${product_id}`
+    sql = `SELECT product_information.id, name, size, quantity, size_id, color_id, product_id FROM product_information join sizes on product_information.size_id = sizes.id join colors on colors.id = product_information.color_id where product_id = ${product_id}`
     console.log(sql);
     db.query(sql, (error, results) => {
         if(error){
@@ -130,5 +118,44 @@ router.post('/get-quantity-of-inventory/:id', (req, res) =>{
         }
 
     })
+})
+router.post('/insert-quantity-of-inventory/:id', (req, res) =>{
+    const product_id = req.params.id;
+    const {product_input} = req.body; 
+    let sql = 'INSERT INTO product_information (product_id, size_id, color_id, quantity) VALUES';
+    if(product_input){
+        sql+= ` (${product_id}, ${product_input.size_id}, ${product_input.color_id}, ${product_input.quantity})`;
+    }
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching products form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!'})
+        }
+    }) 
+})
+router.put('/update-quantity-of-inventory/:id', (req, res) =>{
+    const {product_input} = req.body;
+    const product_id = req.params.id;
+    const sql = `UPDATE product_information SET quantity = ? WHERE product_id = ? and size_id = ? and color_id = ?`;
+    // execute query
+    db.query(sql,[product_input.quantity,product_id ,product_input.size_id, product_input.color_id], (error,  results) => {
+        if (error) {
+            res.status(500).send({ error: 'Error updating product' });
+            console.log(sql);
+            // console.log("product name", product_input.description);
+        } else if (results.affectedRows === 0) {
+            res.status(404).send({ error: `Product with ID not found` });
+            console.log(sql);
+        } else {
+            res.send({ code: 200, message: `Product with ID updated successfully` });
+            console.log(sql);
+            console.log("product name", product_input.description);
+            
+        }
+    }) 
 })
 module.exports = router;

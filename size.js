@@ -47,11 +47,7 @@ router.put('/update-size/:id', (req, res) =>{
     })
 })
 router.post('/', (req, res) =>{
-    const product_id = req.body.product_id;
-    if(!product_id){
-        res.status(400).send({code: 400, message:"Invalid input value"})
-    }
-    let sql = `SELECT size, quantity, price FROM product_sizes join sizes on product_sizes.size_id = sizes.id WHERE status = 0 AND product_id=${product_id}`;
+    let sql = `SELECT * FROM  sizes`;
     console.log(sql);
     db.query(sql, (error, results) => {
         if(error){

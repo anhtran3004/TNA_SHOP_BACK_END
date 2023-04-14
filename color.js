@@ -47,11 +47,7 @@ router.put('/update-color/:id', (req, res) =>{
     })
 })
 router.post('/', (req, res) =>{
-    const product_id = req.body.product_id;
-    if(!product_id){
-        res.status(400).send({code: 400, message:"Invalid input value"})
-    }
-    let sql = `SELECT name, quantity, price FROM product_colors join colors on product_colors.color_id = colors.id WHERE status = 0 AND product_id=${product_id}`;
+    let sql = `SELECT * FROM colors`;
     console.log(sql);
     db.query(sql, (error, results) => {
         if(error){
