@@ -17,7 +17,7 @@ router.post('/insert-color', (req, res)=>{
         }
     })
 });
-router.post('/delete-color', (req, res) =>{
+router.put('/delete-color', (req, res) =>{
     const ids = req.body.ids;
     if(!ids || !Array.isArray(ids)){
         res.status(400).send({code: 400, message:"Invalid request body"});
@@ -47,7 +47,7 @@ router.put('/update-color/:id', (req, res) =>{
     })
 })
 router.post('/', (req, res) =>{
-    let sql = `SELECT * FROM colors`;
+    let sql = `SELECT * FROM colors WHERE status = 1`;
     console.log(sql);
     db.query(sql, (error, results) => {
         if(error){
