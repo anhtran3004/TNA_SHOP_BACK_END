@@ -9,6 +9,10 @@ function formatDate(){
     const formattedDate = `${year}-${month}-${day}`;
     return formattedDate;
 }
+function generateSKU(name){
+    const sku = name.replace(/\s+/g, "-");
+    return sku;
+}
 router.post('/', (req, res) =>{
     const {filter, sort, pagination} = req.body;
     let sql = 'SELECT * FROM products WHERE status = 1 AND 1=1';
@@ -48,9 +52,9 @@ router.post('/', (req, res) =>{
 })
 router.post('/insert-product', (req, res) =>{
     const {product_input} = req.body; 
-    let sql = 'INSERT INTO products (name, price, description, thumb, category_id, hot, discount_id, campain_id, import_date, update_date, priority) VALUES';
+    let sql = 'INSERT INTO products (name, price, sku, description, thumb, category_id, hot, discount_id, campain_id, import_date, update_date, priority) VALUES';
     if(product_input){
-        sql+= ` ("${product_input.name}", ${product_input.price}, "${product_input.description}", "${product_input.thumb}", ${product_input.category_id}, ${product_input.hot},
+        sql+= ` ("${product_input.name}", ${product_input.price},"${generateSKU(product_input.name)}", "${product_input.description}", "${product_input.thumb}", ${product_input.category_id}, ${product_input.hot},
          ${product_input.discount_id}, ${product_input.campaign_id}, "${formatDate()}",  "${formatDate()}", ${product_input.priority})`;
     }
     console.log(sql);   
@@ -67,10 +71,10 @@ router.post('/insert-product', (req, res) =>{
 router.put('/edit-product/:id', (req, res) => {
     const {product_input} = req.body;
     const id = req.params.id;
-    const sql = `UPDATE products SET name = ?, price = ?, description = ?, thumb = ?, category_id = ?, hot = ?, discount_id = ?, campain_id = ?, update_date = ?, priority = ? WHERE id = ?`;
+    const sql = `UPDATE products SET name = ?, sku = ?,  price = ?, description = ?, thumb = ?, category_id = ?, hot = ?, discount_id = ?, campain_id = ?, update_date = ?, priority = ? WHERE id = ?`;
     
     // execute query
-    db.query(sql,[product_input.name, product_input.price, product_input.description, product_input.thumb, product_input.category_id, product_input.hot,
+    db.query(sql,[product_input.name,generateSKU(product_input.name), product_input.price, product_input.description, product_input.thumb, product_input.category_id, product_input.hot,
     product_input.discount_id, product_input.campain_id, new Date(), product_input.priority,
     id], (error,  results) => {
         if (error) {
@@ -113,6 +117,33 @@ router.post('/get-quantity-of-inventory/:id', (req, res) =>{
     db.query(sql, (error, results) => {
         if(error){
             res.status(500).send({code: 500, message:'Error get inventory products'});
+        }else{
+            res.send({code: 200, message: `Get ${results.affectedRows} products`, data: results});
+        }
+
+    })
+})
+router.post('/get-list-color/:id', (req, res) =>{
+    const product_id = req.params.id;
+    sql = `SELECT distinct colors.name FROM product_information join colors on colors.id = product_information.color_id where product_id = ${product_id}`
+    console.log(sql);
+    db.query(sql, (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error get color  inventory'});
+        }else{
+            res.send({code: 200, message: `Get ${results.affectedRows} products`, data: results});
+        }
+
+    })
+})
+router.post('/get-list-size/:id/:name', (req, res) =>{
+    const product_id = req.params.id;
+    const color_name = req.params.name;
+    sql = `SELECT product_information.id, name, size, quantity, size_id, color_id, product_id FROM sa.product_information join sa.sizes on product_information.size_id = sizes.id join sa.colors on colors.id = product_information.color_id where product_id = ${product_id} and name = "${color_name}"`
+    console.log(sql);
+    db.query(sql, (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error get color  inventory'});
         }else{
             res.send({code: 200, message: `Get ${results.affectedRows} products`, data: results});
         }
