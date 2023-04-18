@@ -7,7 +7,7 @@ function generateSKU(name){
 }
 router.post('/', (req, res) =>{
     // const {category_input} = req.body.product_input;
-    const sql = 'SELECT * FROM categories';
+    const sql = 'SELECT * FROM categories WHERE status = 1';
     db.query(sql, (error, results) =>{
         if(error){
             res.status(500).send({code: 500, message:"error get categories"})
