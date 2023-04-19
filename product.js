@@ -25,6 +25,9 @@ router.post('/', (req, res) =>{
         if(filter.category_id && filter.category_id.length > 0){
             sql += ` AND category_id IN (${filter.category_id.join()})`;
         }
+        if(filter.campaign_id && filter.campaign_id.length > 0){
+            sql += ` AND campaign_id IN (${filter.campaign_id.join()})`;
+        }
         if(filter.product_id && filter.product_id.length > 0){
             sql += ` AND id IN (${filter.product_id.join()})`;
         }
