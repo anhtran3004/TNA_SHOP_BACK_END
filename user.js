@@ -1,19 +1,33 @@
 const express = require('express')
 const db = require('./database')
 const router = express.Router()
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const formatDate = require('./formatDate');
-const { createUser } = require('./modelUser');
-async function HashedPassword(password){
-    const hashedPassword = await bcrypt.hash(password, 10);
-    return hashedPassword;
-}
+const dotenv = require('dotenv').config();
+const {authenticate} = require('./jwt')
+const { createUser, getUserByEmail, comparePasswords } = require('./modelUser');
+// async function HashedPassword(password){
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     return hashedPassword;
+// }
 router.post('/insert-user',async (req, res)=>{
     const {user_input} = req.body;
     
         const result = await createUser(user_input.username, user_input.email, user_input.password, user_input.name, user_input.phone, user_input.address, formatDate(), user_input.role_id);
         res.status(200).send({code: 200, message:"insert size sucess", data: result});
 });
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    const user = await getUserByEmail(username);
+    if (!user) return res.status(401).send('Invalid email or password');
+    const isMatch = await comparePasswords(password, user.password);
+    if (!isMatch) return res.status(401).send('Invalid email or password');
+    console.log("user", user);
+    
+    const token = jwt.sign({ id: user.id, role: user.role_id }, process.env.ACCESS_TOKEN_SECRET);
+    res.send({code: 200, message:"Login succcess",data: token });
+  });
 router.put('/delete-user', (req, res) =>{
     const ids = req.body.ids;
     if(!ids || !Array.isArray(ids)){
@@ -45,7 +59,7 @@ router.put('/update-user/:id', (req, res) =>{
         }
     })
 })
-router.post('/', (req, res) =>{
+router.post('/', authenticate('admin'), (req, res) =>{
     let sql = `SELECT * FROM  users WHERE status = 1`;
     console.log(sql);
     db.query(sql, (error, results) => {

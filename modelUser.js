@@ -20,7 +20,7 @@ function createUser(username, email, password, fullname, phone, address, created
 function getUserByEmail(email) {
   return new Promise((resolve, reject) => {
     db.query(
-      'SELECT * FROM users WHERE email = ?',
+      'SELECT * FROM users WHERE username = ?',
       [email],
       (error, results, fields) => {
         if (error) return reject(error);

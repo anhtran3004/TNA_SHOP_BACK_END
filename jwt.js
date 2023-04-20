@@ -1,16 +1,21 @@
-function authenToken(req, res, next) {
-    const authorizationHeader = req.headers['authorization'];
-    //'Beaer [token]'
-    const token = authorizationHeader.split(' ')[1];
-    if(!token) res.status(401).send({error: "missing authenrization token"});
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv').config();
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, data) => {
-        console.log(error, data);
-        if(error){
-            res.send({error: `${error} `})
-        }else{
-            next()
-        }
-    })
-    
+function authenticate(role) {
+  return (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).send('Authorization header missing');
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+      if (err) return res.status(401).send('Invalid token');
+      console.log(decoded);
+      if (role && decoded.role !== role) return res.status(403).send('Forbidden');
+      req.user = decoded;
+      next();
+    });
+  };
 }
+
+module.exports = {
+  authenticate
+};
