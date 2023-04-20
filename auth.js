@@ -9,8 +9,8 @@ router.post('/get-user',authenToken, (req, res) =>{
 })
 router.post('/login', (req, res) =>{
     //Authentication
-    // const {username, password} = req.body;
-
+    const {username, password} = req.body;
+    
     //Authorication
     const data = req.body;
 
