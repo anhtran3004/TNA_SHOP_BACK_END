@@ -15,6 +15,7 @@ router.post('/insert-user',async (req, res)=>{
     const {user_input} = req.body;
     
         const result = await createUser(user_input.username, user_input.email, user_input.password, user_input.name, user_input.phone, user_input.address, formatDate(), user_input.role_id);
+
         res.status(200).send({code: 200, message:"insert size sucess", data: result});
 });
 router.post('/login', async (req, res) => {
@@ -25,9 +26,33 @@ router.post('/login', async (req, res) => {
     if (!isMatch) return res.status(401).send('Invalid email or password');
     console.log("user", user);
     
-    const token = jwt.sign({ id: user.id, role: user.role_id }, process.env.ACCESS_TOKEN_SECRET);
-    res.send({code: 200, message:"Login succcess",data: token });
+    const token = jwt.sign({ id: user.id, role: user.role_id }, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'});
+    const refreshToken = jwt.sign({id: user.id, user: user.username, role: user.role}, process.env.REFRESH_TOKEN_SECRET);
+    
+    //Lưu refresh token vào cơ sở dữ liệu để sử dụng cho việc cập nhật access oekn
+    const insertQuery = `INSERT INTO refresh_tokens (user_id, token) VALUES (${user.id}, '${refreshToken}')`;
+    db.query(insertQuery, (error, results, fields) => {
+        if (error) throw error;
+    })
+    res.status(200).send({code: 200, message:"Login succcess",data: {accessToken: token, refreshToken: refreshToken} });
   });
+router.post('/refreshToken', (req, res) =>{
+    const refreshToken = req.body.refreshToken;
+    console.log("refreshToken", refreshToken)
+    if(!refreshToken) res.status(401).send("missing token");
+    // Kiểm tra xem refresh token có hợp lệ không
+    const query = `SELECT * FROM refresh_tokens WHERE token = '${refreshToken}'`;
+    connection.query(query, (error, results, fields) => {
+        if (error) throw error;
+    })
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (error, data) => {
+        console.log(error, data);
+        if(error)
+            res.status(403).send({error: `${error} `})
+            const accessToken = jwt.sign({data: data.username}, process.env.ACCESS_TOKEN_SECRET);      
+        res.send({accessToken: accessToken})
+    })
+})
 router.put('/delete-user', (req, res) =>{
     const ids = req.body.ids;
     if(!ids || !Array.isArray(ids)){
