@@ -26,7 +26,7 @@ router.post('/login', async (req, res) => {
     if (!isMatch) return res.status(401).send('Invalid email or password');
     console.log("user", user);
     
-    const token = jwt.sign({ id: user.id, role: user.role_id }, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'});
+    const token = jwt.sign({ id: user.id, user: user.username, role: user.role}, process.env.ACCESS_TOKEN_SECRET);
     const refreshToken = jwt.sign({id: user.id, user: user.username, role: user.role}, process.env.REFRESH_TOKEN_SECRET);
     
     //Lưu refresh token vào cơ sở dữ liệu để sử dụng cho việc cập nhật access oekn
@@ -42,7 +42,7 @@ router.post('/refreshToken', (req, res) =>{
     if(!refreshToken) res.status(401).send("missing token");
     // Kiểm tra xem refresh token có hợp lệ không
     const query = `SELECT * FROM refresh_tokens WHERE token = '${refreshToken}'`;
-    connection.query(query, (error, results, fields) => {
+    db.query(query, (error, results, fields) => {
         if (error) throw error;
     })
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (error, data) => {
@@ -86,6 +86,19 @@ router.put('/update-user/:id', (req, res) =>{
 })
 router.post('/', authenticate('admin'), (req, res) =>{
     let sql = `SELECT * FROM  users WHERE status = 1`;
+    console.log(sql);
+    db.query(sql, (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error get sizes'});
+        }else{
+            res.send({code: 200, message: `Get sizes sucess`, data: results} );
+            console.log(sql);
+        }
+    })
+})
+router.post('/get-user/:id', (req, res) =>{
+    const id = req.params.id;
+    let sql = `SELECT * FROM  users WHERE status = 1 and id=`+ id;
     console.log(sql);
     db.query(sql, (error, results) => {
         if(error){
