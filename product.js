@@ -56,7 +56,7 @@ router.post('/', (req, res) =>{
 })
 router.post('/insert-product', (req, res) =>{
     const {product_input} = req.body; 
-    let sql = 'INSERT INTO products (name, price, sku, description, thumb, category_id, hot, discount_id, campain_id, import_date, update_date, priority) VALUES';
+    let sql = 'INSERT INTO products (name, price, sku, description, thumb, category_id, hot, discount_id, campaign_id, import_date, update_date, priority) VALUES';
     if(product_input){
         sql+= ` ("${product_input.name}", ${product_input.price},"${generateSKU(product_input.name)}", "${product_input.description}", "${product_input.thumb}", ${product_input.category_id}, ${product_input.hot},
          ${product_input.discount_id}, ${product_input.campaign_id}, "${formatDate()}",  "${formatDate()}", ${product_input.priority})`;
@@ -68,7 +68,7 @@ router.post('/insert-product', (req, res) =>{
             res.status(500).send({error: 'Error fetching products form database'});
         }else{
             // res.send(results);
-            res.status(200).send({code: 200, message:'success!'})
+            res.status(200).send({code: 200, message:'success!',data: results})
         }
     }) 
 })
