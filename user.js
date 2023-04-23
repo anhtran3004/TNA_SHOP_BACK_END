@@ -72,8 +72,8 @@ router.put('/update-user/:id', (req, res) =>{
     const {user_input} = req.body;
     const id = req.params.id;
     // const password = hashedPassword(user_input.password)
-    let sql = `UPDATE users SET email = ?, name = ?, phone = ?, address = ?, role_id = ? WHERE id = ?`
-    db.query(sql, [user_input.email, user_input.name, user_input.phone, user_input.address, user_input.role_id, id], (error, results) => {
+    let sql = `UPDATE users SET email = ?, name = ?, phone = ?, address = ?,birth_date = ?, role = ? WHERE id = ?`
+    db.query(sql, [user_input.email, user_input.name, user_input.phone, user_input.address,user_input.birth_date, user_input.role, id], (error, results) => {
         if(error){
             res.status(500).send({code: 500, message:'Error updating users'});
             console.log(sql);
