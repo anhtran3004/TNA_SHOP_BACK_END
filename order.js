@@ -21,11 +21,11 @@ router.post('/insert-order', (req, res) =>{
 })
 router.post('/insert-order-product', (req, res) =>{
     const {order_input} = req.body; 
-    let sql = 'INSERT INTO order_products (order_id, product_id, price, quantity, color, size) VALUES';
+    let sql = 'INSERT INTO order_products (order_id, product_id, price, name, thumb, quantity, color, size) VALUES';
     if(order_input){
-        sql+= ` (${order_input.order_id}, ${order_input.product_id}, ${order_input.price}, ${order_input.quantity}, "${order_input.color}", "${order_input.size}")`;
+        sql+= ` (${order_input.order_id}, ${order_input.product_id}, ${order_input.price},"${order_input.name}","${order_input.thumb}", ${order_input.quantity}, "${order_input.color}", "${order_input.size}")`;
     }
-    console.log(sql);   
+    // console.log(sql);   
     // execute query
     db.query(sql, (error,  results) => {
         if(error){
@@ -38,10 +38,39 @@ router.post('/insert-order-product', (req, res) =>{
 })
 router.post('/', (req, res) =>{
     const {status} = req.body; 
-    let sql = 'SELECT * FROM orders WHERE 1=1';
-    if(status && status.length > 0){
-        sql += ` AND status IN (${status.join()})`;
-    }
+    let sql = 'SELECT * FROM orders WHERE status='+ status;
+    // if(status && status.length > 0){
+    //     sql += ` AND status IN (${status.join()})`;
+    // }
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results})
+        }
+    }) 
+})
+router.post('/order-product/:id', (req, res) =>{
+    const id = req.params.id; 
+    let sql = 'SELECT * FROM order_products WHERE order_id=' + id;
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results})
+        }
+    }) 
+})
+router.put('/change-status/:id', (req, res) =>{
+    const id = req.params.id;
+    const {status} = req.body;
+    let sql = 'UPDATE orders SET status = '+ status + ' WHERE id=' + id;
     console.log(sql);   
     // execute query
     db.query(sql, (error,  results) => {

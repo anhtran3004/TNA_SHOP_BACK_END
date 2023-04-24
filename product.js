@@ -40,10 +40,10 @@ router.post('/', (req, res) =>{
         sql += ` ORDER BY ${sort.field} ${sort.order}`;
     }
     const page = (pagination && pagination.page) ? pagination.page : 0;
-    const perPage = (pagination && pagination.perPage) ? pagination.perPage : 10;
+    const perPage = (pagination && pagination.perPage) ? pagination.perPage : 10000;
     const startIndex = page * perPage;
     sql += ` LIMIT ${startIndex}, ${perPage}`;
-    console.log(sql);
+    // console.log(sql);
     // console.log("sql", sql);
     // execute query
     db.query(sql, (error,  results) => {
@@ -75,23 +75,23 @@ router.post('/insert-product', (req, res) =>{
 router.put('/edit-product/:id', (req, res) => {
     const {product_input} = req.body;
     const id = req.params.id;
-    const sql = `UPDATE products SET name = ?, sku = ?,  price = ?, description = ?, thumb = ?, category_id = ?, hot = ?, discount_id = ?, campain_id = ?, update_date = ?, priority = ? WHERE id = ?`;
+    const sql = `UPDATE products SET name = ?, sku = ?,  price = ?, description = ?, thumb = ?, category_id = ?, hot = ?, discount_id = ?, campaign_id = ?, update_date = ?, priority = ? WHERE id = ?`;
     
     // execute query
     db.query(sql,[product_input.name,generateSKU(product_input.name), product_input.price, product_input.description, product_input.thumb, product_input.category_id, product_input.hot,
-    product_input.discount_id, product_input.campain_id, new Date(), product_input.priority,
+    product_input.discount_id, product_input.campain_id, formatDate(), product_input.priority,
     id], (error,  results) => {
         if (error) {
             res.status(500).send({ error: 'Error updating product' });
             console.log(sql);
-            console.log("product name", product_input.description);
+            // console.log("product name", product_input.description);
         } else if (results.affectedRows === 0) {
             res.status(404).send({ error: `Product with ID ${id} not found` });
             console.log(sql);
         } else {
             res.send({ code: 200, message: `Product with ID ${id} updated successfully` });
             console.log(sql);
-            console.log("product name", product_input.description);
+            // console.log("product name", product_input.description);
             
         }
     }) 
