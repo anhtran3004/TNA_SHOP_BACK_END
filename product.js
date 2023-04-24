@@ -154,6 +154,7 @@ router.post('/get-list-size/:id/:name', (req, res) =>{
 
     })
 })
+
 router.post('/insert-quantity-of-inventory/:id', (req, res) =>{
     const product_id = req.params.id;
     const {product_input} = req.body; 
@@ -169,6 +170,22 @@ router.post('/insert-quantity-of-inventory/:id', (req, res) =>{
         }else{
             // res.send(results);
             res.status(200).send({code: 200, message:'success!'})
+        }
+    }) 
+})
+router.post('/get-quantity/:id', (req, res) =>{
+    const product_id = req.params.id;
+    const {product_input} = req.body; 
+    let sql = 'SELECT quantity FROM product_information join sizes on product_information.size_id = sizes.id join colors on colors.id = product_information.color_id where product_id = ? and name = ? and size = ?';
+   
+    console.log(sql);   
+    // execute query
+    db.query(sql,[product_id, product_input.color_name, product_input.size], (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching products form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results})
         }
     }) 
 })
