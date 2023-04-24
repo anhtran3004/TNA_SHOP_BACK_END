@@ -36,6 +36,24 @@ router.post('/insert-order-product', (req, res) =>{
         }
     }) 
 })
+router.post('/get-order-follow-user/:id', (req, res) =>{
+    const {status} = req.body;
+    const userId = req.params.id;
+    let sql = 'SELECT * FROM orders WHERE status='+ status + ' and user_id = '+ userId;
+    // if(status && status.length > 0){
+    //     sql += ` AND status IN (${status.join()})`;
+    // }
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results})
+        }
+    }) 
+})
 router.post('/', (req, res) =>{
     const {status} = req.body; 
     let sql = 'SELECT * FROM orders WHERE status='+ status;
