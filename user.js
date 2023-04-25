@@ -96,6 +96,7 @@ router.post('/', authenticate('admin'), (req, res) =>{
         }
     })
 })
+
 router.post('/get-user/:id', (req, res) =>{
     const id = req.params.id;
     let sql = `SELECT * FROM  users WHERE status = 1 and id=`+ id;

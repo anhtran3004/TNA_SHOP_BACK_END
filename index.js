@@ -16,6 +16,7 @@ const comment = require('./comment');
 const favorite = require('./favorite');
 const productImage = require('./product-image');
 const color = require('./color');
+const contact = require('./contact');
 const learn = require('./learn');
 const auth = require('./auth');
 
@@ -37,6 +38,7 @@ app.use('/api/v1/discount', discount);
 app.use('/api/v1/size', size);
 app.use('/api/v1/user', user);
 app.use('/api/v1/order', order);
+app.use('/api/v1/contact', contact);
 app.use('/api/v1/comment', comment);
 app.use('/api/v1/favorite', favorite);
 app.use('/api/v1/product-image', productImage);
