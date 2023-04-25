@@ -14,8 +14,8 @@ const { createUser, getUserByEmail, comparePasswords } = require('./modelUser');
 router.post('/insert-user',async (req, res)=>{
     const {user_input} = req.body;
     
-        const result = await createUser(user_input.username, user_input.email, user_input.password, user_input.name, user_input.phone, user_input.address, formatDate(), user_input.role_id);
-
+        const result = await createUser(user_input.username, user_input.email, user_input.password, user_input.name, user_input.phone, user_input.address, formatDate(), user_input.role);
+        console.log('result', result);
         res.status(200).send({code: 200, message:"insert size sucess", data: result});
 });
 router.post('/login', async (req, res) => {
@@ -100,6 +100,18 @@ router.post('/', authenticate('admin'), (req, res) =>{
 router.post('/get-user/:id', (req, res) =>{
     const id = req.params.id;
     let sql = `SELECT * FROM  users WHERE status = 1 and id=`+ id;
+    console.log(sql);
+    db.query(sql, (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error get sizes'});
+        }else{
+            res.send({code: 200, message: `Get sizes sucess`, data: results} );
+            console.log(sql);
+        }
+    })
+})
+router.post('/get-username', (req, res) =>{
+    let sql = `SELECT username FROM  users`;
     console.log(sql);
     db.query(sql, (error, results) => {
         if(error){
