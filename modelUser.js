@@ -17,11 +17,24 @@ function createUser(username, email, password, fullname, phone, address, created
   });
 }
 
-function getUserByEmail(email) {
+function getUserByUsername(email) {
   return new Promise((resolve, reject) => {
     db.query(
-      'SELECT * FROM users WHERE username = ?',
-      [email],
+      'SELECT * FROM users WHERE username = ? AND role = ?',
+      [email, 'user'],
+      (error, results, fields) => {
+        if (error) return reject(error);
+        if (results.length === 0) return resolve(null);
+        resolve(results[0]);
+      }
+    );
+  });
+}
+function getUserByUsernameRoleAdmin(email) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      'SELECT * FROM users WHERE username = ? AND role IN (?, ?)',
+      [email, 'admin', 'employee'],
       (error, results, fields) => {
         if (error) return reject(error);
         if (results.length === 0) return resolve(null);
@@ -42,6 +55,7 @@ function comparePasswords(password, hashedPassword) {
 
 module.exports = {
   createUser,
-  getUserByEmail,
+  getUserByUsername,
+  getUserByUsernameRoleAdmin,
   comparePasswords
 };
