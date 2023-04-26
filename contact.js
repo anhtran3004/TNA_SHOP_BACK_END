@@ -1,17 +1,19 @@
 const express = require('express')
+const router = express.Router()
 const db = require('./database');
 const { authenticate } = require("./jwt");
-const router = require("./order");
 const formatDate = require('./formatDate');
 
 router.post('/', (req, res) =>{
     // const {contact_input} = req.body.product_input;
-    const sql = 'SELECT * FROM contacts WHERE status = 1';
+    const sql = 'SELECT * FROM contacts';
     db.query(sql, (error, results) =>{
         if(error){
             res.status(500).send({code: 500, message:"error get contact"})
+            console.log(sql);
         }else{
             res.status(200).send({code: 200, message:"success", data: results});
+            console.log(sql);
         }
     })
 })
