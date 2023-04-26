@@ -210,4 +210,23 @@ router.put('/update-quantity-of-inventory/:id', (req, res) =>{
         }
     }) 
 })
+router.put('/update-quantity-order/:id', (req, res) =>{
+    const {product_input} = req.body;
+    const product_id = req.params.id;
+    const sql = `UPDATE product_information join sizes on product_information.size_id = sizes.id join colors on colors.id = product_information.color_id SET quantity = ? WHERE product_id = ? and name = ? and size = ?`;
+    // execute query
+    db.query(sql,[product_input.quantity,product_id ,product_input.color_name, product_input.size], (error,  results) => {
+        if (error) {
+            res.status(500).send({ error: 'Error updating product' });
+            console.log(sql);
+            // console.log("product name", product_input.description);
+        }
+        else {
+            res.send({ code: 200, message: `Product with ID updated successfully` });
+            console.log(sql);
+            // console.log("product name", product_input.description);
+            
+        }
+    }) 
+})
 module.exports = router;
