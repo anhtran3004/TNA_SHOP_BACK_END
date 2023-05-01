@@ -1,0 +1,107 @@
+const express = require('express')
+const db = require('./database')
+const router = express.Router()
+router.post('/calculate-revenue-follow-year', (req, res) =>{
+    const {year} = req.body; 
+    let sql = 'SELECT SUM(total_price) AS total FROM orders WHERE YEAR(created_date)=' + year;
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results});
+            console.log(results);
+        }
+    }) 
+})
+router.post('/calculate-revenue-follow-month/', (req, res) =>{
+    const {month, year} = req.body; 
+    let sql = 'SELECT SUM(total_price) AS total FROM orders WHERE YEAR(created_date)=? AND MONTH(created_date)=?';
+    console.log(sql);   
+    // execute query
+    db.query(sql,[year, month], (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results});
+            console.log(results);
+        }
+    }) 
+})
+
+router.post('/calculate-revenue-follow-week/', (req, res) =>{
+    const {startDay, endDay} = req.body; 
+    let sql = 'SELECT SUM(total_price) FROM orders WHERE created_date BETWEEN ? AND ?';
+    console.log(sql);   
+    // execute query
+    db.query(sql,[startDay, endDay], (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results});
+            console.log(results);
+        }
+    }) 
+})
+router.post('/calculate-revenue-follow-day/', (req, res) =>{
+    const {year, month, day} = req.body; 
+    let sql = 'SELECT SUM(total_price) AS total FROM orders WHERE YEAR(created_date) = ? AND MONTH(created_date) = ? AND DAY(created_date) = ?';
+    console.log(sql);   
+    // execute query
+    db.query(sql,[year, month, day], (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results});
+            console.log(results);
+        }
+    }) 
+})
+router.post('/year/', (req, res) =>{
+    let sql = 'SELECT DISTINCT YEAR(created_date) AS year FROM orders';
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results});
+            console.log(results);
+        }
+    }) 
+})
+router.post('/month/', (req, res) =>{
+    let sql = 'SELECT DISTINCT YEAR(created_date) AS year, MONTH(created_date) AS month FROM orders';
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results});
+            console.log(results);
+        }
+    }) 
+})
+router.post('/date/', (req, res) =>{
+    let sql = 'SELECT DISTINCT YEAR(created_date) AS year, MONTH(created_date) AS month, DAY(created_date) AS day FROM orders';
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results});
+            console.log(results);
+        }
+    }) 
+})
+module.exports = router;
