@@ -60,7 +60,7 @@ router.post('/get-new-users-follow-day/', (req, res) =>{
 })
 router.post('/get-new-users-follow-year', (req, res) =>{
     const {year} = req.body; 
-    let sql = 'SELECT COUNT(*) AS new_users FROM users WHERE YEAR(created_date) = ? AND role=? ';
+    let sql = 'SELECT COUNT(*) AS new_users FROM users WHERE YEAR(created_date) = ? AND role=? ORDER BY created_date DESC';
     console.log(sql);   
     // execute query
     db.query(sql,[year, 'user'], (error,  results) => {
@@ -75,7 +75,7 @@ router.post('/get-new-users-follow-year', (req, res) =>{
 })
 router.post('/get-new-users-follow-month/', (req, res) =>{
     const {month, year} = req.body; 
-    let sql = 'SELECT COUNT(*) AS new_users FROM users WHERE YEAR(created_date) = ? AND MONTH(created_date) = ? AND role=?';
+    let sql = 'SELECT COUNT(*) AS new_users FROM users WHERE YEAR(created_date) = ? AND MONTH(created_date) = ? AND role=? ORDER BY created_date DESC';
     console.log(sql);   
     // execute query
     db.query(sql,[year, month, 'user'], (error,  results) => {
@@ -88,4 +88,19 @@ router.post('/get-new-users-follow-month/', (req, res) =>{
         }
     }) 
 })
+router.post('/get-hot-product-list/', (req, res) =>{
+    let sql = 'SELECT product_id, name, SUM(quantity) AS total FROM order_products GROUP BY product_id, name order by total DESC';
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results});
+            console.log(results);
+        }
+    }) 
+})
+
 module.exports = router;
