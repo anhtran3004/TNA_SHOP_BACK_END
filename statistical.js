@@ -46,30 +46,22 @@ router.post('/month/', (req, res) =>{
 router.post('/get-new-users-follow-day/', (req, res) =>{
     const {year, month, day} = req.body; 
     let sql = 'SELECT COUNT(*) AS new_users FROM users WHERE YEAR(created_date) = ? AND MONTH(created_date) = ? AND DAY(created_date) = ? AND role=?';
-    console.log(sql);   
-    // execute query
     db.query(sql,[year, month, day, 'user'], (error,  results) => {
         if(error){
             res.status(500).send({error: 'Error fetching orders form database'});
         }else{
-            // res.send(results);
             res.status(200).send({code: 200, message:'success!', data: results});
-            console.log(results);
         }
     }) 
 })
 router.post('/get-new-users-follow-year', (req, res) =>{
     const {year} = req.body; 
     let sql = 'SELECT COUNT(*) AS new_users FROM users WHERE YEAR(created_date) = ? AND role=? ORDER BY created_date DESC';
-    console.log(sql);   
-    // execute query
     db.query(sql,[year, 'user'], (error,  results) => {
         if(error){
             res.status(500).send({error: 'Error fetching orders form database'});
         }else{
-            // res.send(results);
             res.status(200).send({code: 200, message:'success!', data: results});
-            console.log(results);
         }
     }) 
 })
