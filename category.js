@@ -7,7 +7,7 @@ function generateSKU(name){
 }
 router.post('/', (req, res) =>{
     // const {category_input} = req.body.product_input;
-    const sql = 'SELECT * FROM categories WHERE status = 1';
+    const sql = 'SELECT * FROM categories';
     db.query(sql, (error, results) =>{
         if(error){
             res.status(500).send({code: 500, message:"error get categories"})
@@ -54,14 +54,15 @@ router.put('/update-category/:id', (req, res) =>{
 })
 router.put('/delete-category', (req, res) =>{
     const ids = req.body.ids;
+    const status = req.body.status;
     if(!ids || !Array.isArray(ids)){
         res.status(400).send({code: 400, message:"invalid input value"});
         return;
     }
-    const sql = 'UPDATE categories SET status = 0 WHERE id IN (?)';
+    const sql = 'UPDATE categories SET status = ? WHERE id IN (?)';
     
     console.log(sql);
-    db.query(sql,[ids], (error, results) =>{
+    db.query(sql,[status, ids], (error, results) =>{
         if(error){
             res.status(500).send({code: 500, message:"error delete category"})
         }else{
