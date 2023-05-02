@@ -1,5 +1,6 @@
 const express = require('express')
 const db = require('./database')
+const { authenticates } = require('./jwt');
 const router = express.Router()
 function generateSKU(name){
     const sku = name.replace(/\s+/g, "-");
@@ -16,7 +17,7 @@ router.post('/', (req, res) =>{
         }
     })
 })
-router.post('/insert-category', (req, res)=>{
+router.post('/insert-category', authenticates(['admin', 'employee']) , (req, res)=>{
     const {category_input} = req.body;
     if(!category_input){
         res.status(400).json({code: 400, message:"invalid input value"})
@@ -34,7 +35,7 @@ router.post('/insert-category', (req, res)=>{
         }
     })
 })
-router.put('/update-category/:id', (req, res) =>{
+router.put('/update-category/:id' , authenticates(['admin', 'employee']), (req, res) =>{
     const {category_input} = req.body;
     const id = req.params.id;
     if(!category_input){
@@ -52,7 +53,7 @@ router.put('/update-category/:id', (req, res) =>{
         }
     })
 })
-router.put('/delete-category', (req, res) =>{
+router.put('/delete-category' , authenticates(['admin', 'employee']), (req, res) =>{
     const ids = req.body.ids;
     const status = req.body.status;
     if(!ids || !Array.isArray(ids)){

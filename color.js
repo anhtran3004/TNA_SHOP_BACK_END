@@ -1,8 +1,9 @@
 const express = require('express')
 const db = require('./database')
 const router = express.Router()
+const { authenticates } = require('./jwt');
 
-router.post('/insert-color', (req, res)=>{
+router.post('/insert-color', authenticates(['admin', 'employee']) , (req, res)=>{
     const {color} = req.body;
     let sql = `INSERT INTO colors (name) VALUES`;
     if(color){
@@ -17,7 +18,7 @@ router.post('/insert-color', (req, res)=>{
         }
     })
 });
-router.put('/delete-color', (req, res) =>{
+router.put('/delete-color' , authenticates(['admin', 'employee']), (req, res) =>{
     const ids = req.body.ids;
     if(!ids || !Array.isArray(ids)){
         res.status(400).send({code: 400, message:"Invalid request body"});
@@ -32,7 +33,7 @@ router.put('/delete-color', (req, res) =>{
         }
     })
 })
-router.put('/update-color/:id', (req, res) =>{
+router.put('/update-color/:id', authenticates(['admin', 'employee']) , (req, res) =>{
     const color = req.body.color;
     const id = req.params.id;
 

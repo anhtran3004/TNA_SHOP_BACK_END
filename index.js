@@ -20,7 +20,6 @@ const statistical = require('./statistical');
 const productImage = require('./product-image');
 const color = require('./color');
 const contact = require('./contact');
-const learn = require('./learn');
 const auth = require('./auth');
 
 const cors=require("cors");
@@ -34,7 +33,6 @@ app.use(cors(corsOptions))
 
 app.use(express.json());
 app.use('/api/v1/product', product);
-app.use('/api/v1/learn',learn );
 app.use('/api/v1/category', category);
 app.use('/api/v1/campaign', campaign);
 app.use('/api/v1/discount', discount);

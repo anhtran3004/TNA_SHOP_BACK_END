@@ -28,17 +28,35 @@ router.post('/', (req, res) =>{
 })
 router.post('/get-child-comment', (req, res) =>{
     // const {comment_input} = req.body.product_input;
-    const comment_id = req.body.comment_id
+    const {comment_id} = req.body.comment_id
     const sql = 'SELECT * FROM child_comment WHERE comment_id = ' + comment_id;
     db.query(sql, (error, results) =>{
         if(error){
-            res.status(500).send({code: 500, message:"error get comment"})
+            res.status(500).send({code: 500, message:"error get comment"});
+            console.log(sql);
         }else{
             res.status(200).send({code: 200, message:"success", data: results});
+            console.log(sql);
+
         }
     })
 })
-router.post('/delete-child-comment/:id', authenticates(['admin', 'employee']), (req, res) =>{
+router.post('/get-child-comments/:id', (req, res) =>{
+    // const {comment_input} = req.body.product_input;
+    const comment_id = req.params.id
+    const sql = 'SELECT * FROM child_comment WHERE comment_id = ' + comment_id;
+    db.query(sql, (error, results) =>{
+        if(error){
+            res.status(500).send({code: 500, message:"error get comment"});
+            console.log(sql);
+        }else{
+            res.status(200).send({code: 200, message:"success", data: results});
+            console.log(sql);
+
+        }
+    })
+})
+router.post('/delete-child-comment/:id', authenticates(['admin', 'employee']) , authenticates(['admin', 'employee']), (req, res) =>{
     const id = req.params.id;
     const sql = 'DELETE FROM child_comment WHERE id = ' + id;
     console.log(sql);
@@ -82,7 +100,7 @@ router.post('/insert-comment',authenticate('user'), (req, res)=>{
         }
     })
 })
-router.post('/reply-comment',authenticates(['admin', 'employee']), (req, res)=>{
+router.post('/reply-comment' , authenticates(['admin', 'employee']),authenticates(['admin', 'employee']), (req, res)=>{
     const {comment_input} = req.body;
     // if(!comment_input){
     //     res.status(400).json({code: 400, message:"invalid input value"})
@@ -100,7 +118,7 @@ router.post('/reply-comment',authenticates(['admin', 'employee']), (req, res)=>{
         }
     })
 })
-router.post('/delete-comment/:id', authenticates(['admin', 'employee']), (req, res) =>{
+router.post('/delete-comment/:id' , authenticates(['admin', 'employee']), (req, res) =>{
     const id = req.params.id;
     const sql = 'DELETE FROM comments WHERE id = ' + id;
     console.log(sql);

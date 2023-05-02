@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const db = require('./database');
 const { authenticate } = require("./jwt");
+const { authenticates } = require('./jwt');
 const formatDate = require('./formatDate');
 
 router.post('/', (req, res) =>{
@@ -17,7 +18,7 @@ router.post('/', (req, res) =>{
         }
     })
 })
-router.post('/insert-contact', (req, res)=>{
+router.post('/insert-contact' , (req, res)=>{
     const {contact_input} = req.body;
     if(!contact_input){
         res.status(400).json({code: 400, message:"invalid input value"})
@@ -36,7 +37,7 @@ router.post('/insert-contact', (req, res)=>{
         }
     })
 })
-router.post('/delete-contact/:id',authenticate('admin'), (req, res) =>{
+router.post('/delete-contact/:id',authenticates(['admin', 'employee']), (req, res) =>{
     const id = req.params.id;
     let sql = `DELETE FROM contacts WHERE id=` + id
     db.query(sql, (error, results) => {

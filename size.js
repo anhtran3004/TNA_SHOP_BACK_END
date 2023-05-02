@@ -1,8 +1,9 @@
 const express = require('express')
 const db = require('./database')
+const { authenticates } = require('./jwt');
 const router = express.Router()
 
-router.post('/insert-size', (req, res)=>{
+router.post('/insert-size' , authenticates(['admin', 'employee']), (req, res)=>{
     const {size} = req.body;
     let sql = `INSERT INTO sizes (size) VALUES`;
     if(size){
@@ -17,7 +18,7 @@ router.post('/insert-size', (req, res)=>{
         }
     })
 });
-router.put('/delete-size', (req, res) =>{
+router.put('/delete-size' , authenticates(['admin', 'employee']), (req, res) =>{
     const ids = req.body.ids;
     if(!ids || !Array.isArray(ids)){
         res.status(400).send({code: 400, message:"Invalid request body"});
@@ -32,7 +33,7 @@ router.put('/delete-size', (req, res) =>{
         }
     })
 })
-router.put('/update-size/:id', (req, res) =>{
+router.put('/update-size/:id' , authenticates(['admin', 'employee']), (req, res) =>{
     const size = req.body.size;
     const id = req.params.id;
 
@@ -46,7 +47,7 @@ router.put('/update-size/:id', (req, res) =>{
         }
     })
 })
-router.post('/', (req, res) =>{
+router.post('/' , authenticates(['admin', 'employee']), (req, res) =>{
     let sql = `SELECT * FROM  sizes WHERE status = 1`;
     console.log(sql);
     db.query(sql, (error, results) => {

@@ -1,5 +1,6 @@
 const express = require('express')
 const db = require('./database');
+const { authenticates } = require('./jwt');
 const router = express.Router()
 function generateSKU(name){
     const sku = name.replace(/\s+/g, "-");
@@ -25,7 +26,7 @@ router.post('/', (req, res) =>{
         }
     })
 })
-router.post('/insert-campaign', (req, res)=>{
+router.post('/insert-campaign', authenticates(['admin', 'employee']), (req, res)=>{
     const {campaign_input} = req.body;
     if(!campaign_input){
         res.status(400).json({code: 400, message:"invalid input value"})
@@ -43,7 +44,7 @@ router.post('/insert-campaign', (req, res)=>{
         }
     })
 })
-router.put('/update-campaign/:id', (req, res) =>{
+router.put('/update-campaign/:id', authenticates(['admin', 'employee']), (req, res) =>{
     const {campaign_input} = req.body;
     const id = req.params.id;
     if(!campaign_input){
@@ -63,7 +64,7 @@ router.put('/update-campaign/:id', (req, res) =>{
         }
     })
 })
-router.put('/delete-campaign', (req, res) =>{
+router.put('/delete-campaign', authenticates(['admin', 'employee']), (req, res) =>{
     const ids = req.body.ids;
     if(!ids || !Array.isArray(ids)){
         res.status(400).send({code: 400, message:"invalid input value"});

@@ -1,6 +1,7 @@
 const express = require('express')
 const db = require('./database')
 const router = express.Router()
+const { authenticates } = require('./jwt');
 function generateSKU(name){
     const sku = name.replace(/\s+/g, "-");
     return sku;
@@ -24,7 +25,7 @@ router.post('/', (req, res) =>{
         }
     })
 })
-router.post('/insert-discount', (req, res)=>{
+router.post('/insert-discount' , authenticates(['admin', 'employee']), (req, res)=>{
     const {discount_input} = req.body;
     if(!discount_input){
         res.status(400).json({code: 400, message:"invalid input value"})
@@ -42,7 +43,7 @@ router.post('/insert-discount', (req, res)=>{
         }
     })
 })
-router.put('/update-discount/:id', (req, res) =>{
+router.put('/update-discount/:id', authenticates(['admin', 'employee']) , (req, res) =>{
     const {discount_input} = req.body;
     const id = req.params.id;
     if(!discount_input){
@@ -62,7 +63,7 @@ router.put('/update-discount/:id', (req, res) =>{
         }
     })
 })
-router.put('/delete-discount', (req, res) =>{
+router.put('/delete-discount', authenticates(['admin', 'employee']) , (req, res) =>{
     const ids = req.body.ids;
     if(!ids || !Array.isArray(ids)){
         res.status(400).send({code: 400, message:"invalid input value"});

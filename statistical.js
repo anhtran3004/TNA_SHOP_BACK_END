@@ -1,7 +1,8 @@
 const express = require('express')
-const db = require('./database')
+const db = require('./database');
+const { authenticates } = require('./jwt');
 const router = express.Router()
-router.post('/date/', (req, res) =>{
+router.post('/date/', authenticates(['admin', 'employee']), (req, res) =>{
     let sql = `SELECT DISTINCT YEAR(created_date) AS year, MONTH(created_date) AS month, DAY(created_date) AS day FROM users WHERE role = 'user'`;
     console.log(sql);   
     // execute query
@@ -15,7 +16,7 @@ router.post('/date/', (req, res) =>{
         }
     }) 
 })
-router.post('/year/', (req, res) =>{
+router.post('/year/',authenticates(['admin', 'employee']), (req, res) =>{
     let sql = `SELECT DISTINCT YEAR(created_date) AS year FROM users WHERE role = 'user'`;
     console.log(sql);   
     // execute query
@@ -29,7 +30,7 @@ router.post('/year/', (req, res) =>{
         }
     }) 
 })
-router.post('/month/', (req, res) =>{
+router.post('/month/',authenticates(['admin', 'employee']), (req, res) =>{
     let sql = `SELECT DISTINCT YEAR(created_date) AS year, MONTH(created_date) AS month FROM users WHERE role = 'user'`;
     console.log(sql);   
     // execute query
@@ -43,7 +44,7 @@ router.post('/month/', (req, res) =>{
         }
     }) 
 })
-router.post('/get-new-users-follow-day/', (req, res) =>{
+router.post('/get-new-users-follow-day/',authenticates(['admin', 'employee']), (req, res) =>{
     const {year, month, day} = req.body; 
     let sql = 'SELECT COUNT(*) AS new_users FROM users WHERE YEAR(created_date) = ? AND MONTH(created_date) = ? AND DAY(created_date) = ? AND role=?';
     db.query(sql,[year, month, day, 'user'], (error,  results) => {
@@ -54,7 +55,7 @@ router.post('/get-new-users-follow-day/', (req, res) =>{
         }
     }) 
 })
-router.post('/get-new-users-follow-year', (req, res) =>{
+router.post('/get-new-users-follow-year',authenticates(['admin', 'employee']), (req, res) =>{
     const {year} = req.body; 
     let sql = 'SELECT COUNT(*) AS new_users FROM users WHERE YEAR(created_date) = ? AND role=? ORDER BY created_date DESC';
     db.query(sql,[year, 'user'], (error,  results) => {
@@ -65,7 +66,7 @@ router.post('/get-new-users-follow-year', (req, res) =>{
         }
     }) 
 })
-router.post('/get-new-users-follow-month/', (req, res) =>{
+router.post('/get-new-users-follow-month/',authenticates(['admin', 'employee']), (req, res) =>{
     const {month, year} = req.body; 
     let sql = 'SELECT COUNT(*) AS new_users FROM users WHERE YEAR(created_date) = ? AND MONTH(created_date) = ? AND role=? ORDER BY created_date DESC';
     console.log(sql);   
@@ -80,7 +81,7 @@ router.post('/get-new-users-follow-month/', (req, res) =>{
         }
     }) 
 })
-router.post('/get-hot-product-list/', (req, res) =>{
+router.post('/get-hot-product-list/', authenticates(['admin', 'employee']), (req, res) =>{
     let sql = 'SELECT product_id, name, SUM(quantity) AS total FROM order_products GROUP BY product_id, name order by total DESC';
     console.log(sql);   
     // execute query

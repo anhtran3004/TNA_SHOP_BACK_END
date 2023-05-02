@@ -1,5 +1,6 @@
 const express = require('express')
 const db = require('./database')
+const { authenticates } = require('./jwt');
 const router = express.Router()
 function formatDate(){
     const dateObj = new Date();
@@ -54,7 +55,7 @@ router.post('/', (req, res) =>{
         }
     }) 
 })
-router.post('/insert-product', (req, res) =>{
+router.post('/insert-product' , authenticates(['admin', 'employee']), (req, res) =>{
     const {product_input} = req.body; 
     let sql = 'INSERT INTO products (name, price, sku, description, thumb, category_id, hot, discount_id, campaign_id, import_date, update_date, priority) VALUES';
     if(product_input){
@@ -72,7 +73,7 @@ router.post('/insert-product', (req, res) =>{
         }
     }) 
 })
-router.put('/edit-product/:id', (req, res) => {
+router.put('/edit-product/:id' , authenticates(['admin', 'employee']), (req, res) => {
     const {product_input} = req.body;
     const id = req.params.id;
     const sql = `UPDATE products SET name = ?, sku = ?,  price = ?, description = ?, thumb = ?, category_id = ?, hot = ?, discount_id = ?, campaign_id = ?, update_date = ?, priority = ? WHERE id = ?`;
@@ -96,7 +97,7 @@ router.put('/edit-product/:id', (req, res) => {
         }
     }) 
 })
-router.put('/delete-product', (req, res) =>{
+router.put('/delete-product' , authenticates(['admin', 'employee']), (req, res) =>{
     const ids = req.body.ids; 
     if(!ids || !Array.isArray(ids)){
         res.status(400).send({code: 400, message:"Invalid request body"});
@@ -114,7 +115,7 @@ router.put('/delete-product', (req, res) =>{
 
 
 })
-router.put('/delete-product-follow-category/:id', (req, res) =>{
+router.put('/delete-product-follow-category/:id' , authenticates(['admin', 'employee']), (req, res) =>{
     const id = req.params.id;
     const status = req.body.status;
     const sql = `UPDATE products SET status = ? WHERE category_id = (?)`; // sử dụng tham số IN để xóa nhiều sản phẩm
@@ -129,7 +130,7 @@ router.put('/delete-product-follow-category/:id', (req, res) =>{
 
 
 })
-router.post('/get-quantity-of-inventory/:id', (req, res) =>{
+router.post('/get-quantity-of-inventory/:id' , authenticates(['admin', 'employee']), (req, res) =>{
     const product_id = req.params.id;
     sql = `SELECT product_information.id, name, size, quantity, size_id, color_id, product_id FROM product_information join sizes on product_information.size_id = sizes.id join colors on colors.id = product_information.color_id where product_id = ${product_id}`
     console.log(sql);
