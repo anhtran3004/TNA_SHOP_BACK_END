@@ -1,6 +1,7 @@
 const express = require('express')
 const db = require('./database');
 const { authenticate } = require('./jwt');
+const { authenticates } = require('./jwt');
 const router = express.Router()
 function generateSKU(name){
     const sku = name.replace(/\s+/g, "-");
@@ -22,6 +23,30 @@ router.post('/', (req, res) =>{
             res.status(500).send({code: 500, message:"error get comment"})
         }else{
             res.status(200).send({code: 200, message:"success", data: results});
+        }
+    })
+})
+router.post('/get-child-comment', (req, res) =>{
+    // const {comment_input} = req.body.product_input;
+    const comment_id = req.body.comment_id
+    const sql = 'SELECT * FROM child_comment WHERE comment_id = ' + comment_id;
+    db.query(sql, (error, results) =>{
+        if(error){
+            res.status(500).send({code: 500, message:"error get comment"})
+        }else{
+            res.status(200).send({code: 200, message:"success", data: results});
+        }
+    })
+})
+router.post('/delete-child-comment/:id', authenticates(['admin', 'employee']), (req, res) =>{
+    const id = req.params.id;
+    const sql = 'DELETE FROM child_comment WHERE id = ' + id;
+    console.log(sql);
+    db.query(sql, (error, results) =>{
+        if(error){
+            res.status(500).send({code: 500, message:"error delete comment"})
+        }else{
+            res.status(200).send({code: 200, message:"insert success!"})
         }
     })
 })
@@ -57,16 +82,29 @@ router.post('/insert-comment',authenticate('user'), (req, res)=>{
         }
     })
 })
-router.put('/delete-comment', (req, res) =>{
-    const ids = req.body.ids;
-    if(!ids || !Array.isArray(ids)){
-        res.status(400).send({code: 400, message:"invalid input value"});
-        return;
+router.post('/reply-comment',authenticates(['admin', 'employee']), (req, res)=>{
+    const {comment_input} = req.body;
+    // if(!comment_input){
+    //     res.status(400).json({code: 400, message:"invalid input value"})
+    // }
+    let sql = 'INSERT INTO child_comment (content, comment_date, comment_id) VALUES';
+    if(comment_input){
+        sql += `("${comment_input.content}","${formatDate()}", ${comment_input.comment_id})`
     }
-    const sql = 'UPDATE comments SET status = 0 WHERE id IN (?)';
-    
     console.log(sql);
-    db.query(sql,[ids], (error, results) =>{
+    db.query(sql, (error, results) =>{
+        if(error){
+            res.status(500).json({code: 500, message:"error insert comment"})
+        }else{
+            res.status(200).json({code: 200, message:"insert success!"});
+        }
+    })
+})
+router.post('/delete-comment/:id', authenticates(['admin', 'employee']), (req, res) =>{
+    const id = req.params.id;
+    const sql = 'DELETE FROM comments WHERE id = ' + id;
+    console.log(sql);
+    db.query(sql, (error, results) =>{
         if(error){
             res.status(500).send({code: 500, message:"error delete comment"})
         }else{
