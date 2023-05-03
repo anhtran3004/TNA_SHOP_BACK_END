@@ -33,10 +33,8 @@ router.post('/get-child-comment', (req, res) =>{
     db.query(sql, (error, results) =>{
         if(error){
             res.status(500).send({code: 500, message:"error get comment"});
-            console.log(sql);
         }else{
             res.status(200).send({code: 200, message:"success", data: results});
-            console.log(sql);
 
         }
     })
@@ -48,10 +46,8 @@ router.post('/get-child-comments/:id', (req, res) =>{
     db.query(sql, (error, results) =>{
         if(error){
             res.status(500).send({code: 500, message:"error get comment"});
-            console.log(sql);
         }else{
             res.status(200).send({code: 200, message:"success", data: results});
-            console.log(sql);
 
         }
     })

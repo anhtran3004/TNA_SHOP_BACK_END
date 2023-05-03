@@ -17,6 +17,7 @@ function generateSKU(name){
 router.post('/', (req, res) =>{
     const {filter, sort, pagination} = req.body;
     let sql = 'SELECT * FROM products WHERE status = 1 AND 1=1';
+    const dbParams = [];
 
     // apply filters    
     if(filter){
@@ -36,6 +37,12 @@ router.post('/', (req, res) =>{
             sql += ` AND price BETWEEN ${filter.price.min} AND ${filter.price.max}`;
             
         }
+        // add search condition
+        if(filter.search){
+            const searchValue = `%${filter.search}%`;
+            sql += ` AND (name LIKE ? OR description LIKE ?)`;
+            dbParams.push(searchValue, searchValue);
+        }
     }
     if(sort && sort.field && sort.order){
         sql += ` ORDER BY ${sort.field} ${sort.order}`;
@@ -44,10 +51,7 @@ router.post('/', (req, res) =>{
     const perPage = (pagination && pagination.perPage) ? pagination.perPage : 10000;
     const startIndex = page * perPage;
     sql += ` LIMIT ${startIndex}, ${perPage}`;
-    // console.log(sql);
-    // console.log("sql", sql);
-    // execute query
-    db.query(sql, (error,  results) => {
+    db.query(sql,dbParams, (error,  results) => {
         if(error){
             res.status(500).send({error: 'Error fetching products form database'});
         }else{
