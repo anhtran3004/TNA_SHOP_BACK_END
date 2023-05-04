@@ -84,7 +84,7 @@ router.put('/edit-product/:id' , authenticates(['admin', 'employee']), (req, res
     
     // execute query
     db.query(sql,[product_input.name,generateSKU(product_input.name), product_input.price, product_input.description, product_input.thumb, product_input.category_id, product_input.hot,
-    product_input.discount_id, product_input.campain_id, formatDate(), product_input.priority,
+    product_input.discount_id, product_input.campaign_id, formatDate(), product_input.priority,
     id], (error,  results) => {
         if (error) {
             res.status(500).send({ error: 'Error updating product' });
