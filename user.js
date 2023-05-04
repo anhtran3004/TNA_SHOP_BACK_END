@@ -128,7 +128,7 @@ router.post('/update-user-by-admin/:id',authenticate('admin'), (req, res) =>{
     })
 })
 router.post('/', authenticate('admin'), (req, res) =>{
-    let sql = `SELECT * FROM  users`;
+    let sql = `SELECT * FROM  users ORDER BY created_date DESC`;
     console.log(sql);
     db.query(sql, (error, results) => {
         if(error){
@@ -154,7 +154,7 @@ router.post('/get-user/:id', (req, res) =>{
     })
 })
 router.post('/get-username', (req, res) =>{
-    let sql = `SELECT username FROM  users`;
+    let sql = `SELECT username, email FROM  users`;
     console.log(sql);
     db.query(sql, (error, results) => {
         if(error){
