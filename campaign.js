@@ -26,6 +26,17 @@ router.post('/', (req, res) =>{
         }
     })
 })
+router.post('/get-admin', (req, res) =>{
+    // const {category_input} = req.body.product_input;
+    const sql = 'SELECT * FROM campaigns WHERE status IN (1, 2)';
+    db.query(sql, (error, results) =>{
+        if(error){
+            res.status(500).send({code: 500, message:"error get campaigns"})
+        }else{
+            res.status(200).send({code: 200, message:"success", data: results});
+        }
+    })
+})
 router.post('/insert-campaign', authenticates(['admin', 'employee']), (req, res)=>{
     const {campaign_input} = req.body;
     if(!campaign_input){
