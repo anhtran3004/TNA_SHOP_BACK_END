@@ -37,6 +37,10 @@ router.post('/', (req, res) =>{
             sql += ` AND price BETWEEN ${filter.price.min} AND ${filter.price.max}`;
             
         }
+        if(filter.import_date){
+            sql += ` AND import_date BETWEEN "${filter.import_date.min}" AND "${filter.import_date.max}"`;
+            
+        }
         // add search condition
         if(filter.search){
             const searchValue = `%${filter.search}%`;
@@ -54,8 +58,10 @@ router.post('/', (req, res) =>{
     db.query(sql,dbParams, (error,  results) => {
         if(error){
             res.status(500).send({error: 'Error fetching products form database'});
+            console.log(sql);
         }else{
             res.status(200).send({code: 200, message: "success!", data: results});
+            console.log(sql);
         }
     }) 
 })
