@@ -27,13 +27,31 @@ router.post('/', (req, res) =>{
     })
 })
 router.post('/get-admin', (req, res) =>{
+    const {filter, sort} = req.body;
+    const dbParams = [];
     // const {category_input} = req.body.product_input;
-    const sql = 'SELECT * FROM campaigns WHERE status IN (1, 2)';
-    db.query(sql, (error, results) =>{
+    let sql = 'SELECT * FROM campaigns WHERE status IN (1, 2)';
+    if(filter){
+        if(filter.search){
+            const searchValue = `%${filter.search}%`;
+            sql += ` AND (name LIKE ? OR campaign_description LIKE ?)`;
+            dbParams.push(searchValue, searchValue);
+        }
+        if(filter.start_day){
+            sql += ` AND start_day BETWEEN "${filter.start_day.min}" AND "${filter.start_day.max}"`;
+            
+        }
+        if(sort && sort.field && sort.order){
+            sql += ` ORDER BY ${sort.field} ${sort.order}`;
+        }
+    }
+    db.query(sql,dbParams, (error, results) =>{
         if(error){
-            res.status(500).send({code: 500, message:"error get campaigns"})
+            res.status(500).send({code: 500, message:"error get campaigns"});
+            console.log(sql);
         }else{
             res.status(200).send({code: 200, message:"success", data: results});
+            console.log(sql);
         }
     })
 })
