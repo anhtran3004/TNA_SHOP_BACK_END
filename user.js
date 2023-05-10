@@ -128,11 +128,27 @@ router.post('/update-user-by-admin/:id',authenticate('admin'), (req, res) =>{
     })
 })
 router.post('/', authenticate('admin'), (req, res) =>{
-    let sql = `SELECT * FROM  users ORDER BY created_date DESC`;
-    console.log(sql);
-    db.query(sql, (error, results) => {
+    const {filter, sort} = req.body;
+    const dbParams = [];
+    let sql = `SELECT * FROM users WHERE 1=1 `;
+    if(filter){
+        if(filter.search){
+            const searchValue = `%${filter.search}%`;
+            sql += ` AND (name LIKE ? OR username LIKE ? OR email LIKE ? OR phone LIKE ?)`;
+            dbParams.push(searchValue, searchValue, searchValue, searchValue, searchValue);
+        }
+        if(filter.created_date){
+            sql += ` AND created_date BETWEEN "${filter.created_date.min}" AND "${filter.created_date.max}"`;
+            
+        }
+        if(sort && sort.field && sort.order){
+            sql += ` ORDER BY ${sort.field} ${sort.order}`;
+        }
+    }
+    db.query(sql,dbParams, (error, results) => {
         if(error){
             res.status(500).send({code: 500, message:'Error get sizes'});
+            console.log(sql);
         }else{
             res.send({code: 200, message: `Get sizes sucess`, data: results} );
             console.log(sql);
