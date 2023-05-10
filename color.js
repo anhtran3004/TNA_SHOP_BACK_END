@@ -33,6 +33,19 @@ router.put('/delete-color' , authenticates(['admin', 'employee']), (req, res) =>
         }
     })
 })
+router.post('/delete-colors/:id' , authenticates(['admin', 'employee']), (req, res) =>{
+    const id = req.params.id;
+    let sql = `DELETE FROM colors WHERE id=` + id
+    db.query(sql, (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error deleting colors'});
+            console.log(sql)
+        }else{
+            res.send({code: 200, message: `Deleted ${results.affectedRows} colors`});
+            console.log(sql)
+        }
+    })
+})
 router.put('/update-color/:id', authenticates(['admin', 'employee']) , (req, res) =>{
     const color = req.body.color;
     const id = req.params.id;
