@@ -135,7 +135,7 @@ router.post('/', authenticate('admin'), (req, res) =>{
         if(filter.search){
             const searchValue = `%${filter.search}%`;
             sql += ` AND (name LIKE ? OR username LIKE ? OR email LIKE ? OR phone LIKE ?)`;
-            dbParams.push(searchValue, searchValue, searchValue, searchValue, searchValue);
+            dbParams.push(searchValue, searchValue, searchValue, searchValue);
         }
         if(filter.created_date){
             sql += ` AND created_date BETWEEN "${filter.created_date.min}" AND "${filter.created_date.max}"`;
