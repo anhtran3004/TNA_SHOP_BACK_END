@@ -25,6 +25,36 @@ router.post('/', (req, res) =>{
         }
     })
 })
+router.post('/get-discount', (req, res) =>{
+    // const {discount_input} = req.body.product_input;
+    const {filter, sort} = req.body; 
+    const dbParams = [];
+    let sql = 'SELECT * FROM discounts  WHERE status = 1';
+    if(filter){
+        if(filter.start_day){
+            sql += ` AND start_day BETWEEN "${filter.start_day.min}" AND "${filter.start_day.max}"`;
+        }
+        // add search condition
+        if(filter.search){
+            const searchValue = `%${filter.search}%`;
+            sql += ` AND (discount_code LIKE ? OR discount_value LIKE ?)`;
+            dbParams.push(searchValue, searchValue);
+        }
+    }
+    if(sort && sort.field && sort.order){
+        sql += ` ORDER BY ${sort.field} ${sort.order}`;
+    }
+    db.query(sql,dbParams, (error, results) =>{
+        if(error){
+            res.status(500).send({code: 500, message:"error get discount"})
+            console.log(sql);
+        }else{
+            res.status(200).send({code: 200, message:"success", data: results});
+            console.log(sql);
+
+        }
+    })
+})
 router.post('/insert-discount' , authenticates(['admin', 'employee']), (req, res)=>{
     const {discount_input} = req.body;
     if(!discount_input){
