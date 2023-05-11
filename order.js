@@ -55,19 +55,47 @@ router.post('/get-order-follow-user/:id', (req, res) =>{
     }) 
 })
 router.post('/', (req, res) =>{
-    const {status} = req.body; 
-    let sql = 'SELECT * FROM orders WHERE status='+ status;
-    // if(status && status.length > 0){
-    //     sql += ` AND status IN (${status.join()})`;
-    // }
+    const {status} = req.body
+    let sql = 'SELECT * FROM orders WHERE status='+ status + ' ORDER BY created_date DESC';
     console.log(sql);   
     // execute query
-    db.query(sql, (error,  results) => {
+    db.query(sql,dbParams, (error,  results) => {
         if(error){
             res.status(500).send({error: 'Error fetching orders form database'});
         }else{
             // res.send(results);
             res.status(200).send({code: 200, message:'success!', data: results})
+        }
+    }) 
+})
+router.post('/get-order', (req, res) =>{
+    const {status, filter, sort} = req.body; 
+    const dbParams = [];
+    let sql = 'SELECT * FROM orders WHERE status='+ status ;
+    if(filter){
+        if(filter.created_date){
+            sql += ` AND created_date BETWEEN "${filter.created_date.min}" AND "${filter.created_date.max}"`;
+        }
+        // add search condition
+        if(filter.search){
+            const searchValue = `%${filter.search}%`;
+            sql += ` AND (name LIKE ? OR phone LIKE ? OR email LIKE ? OR address LIKE ?)`;
+            dbParams.push(searchValue, searchValue, searchValue, searchValue);
+        }
+    }
+    if(sort && sort.field && sort.order){
+        sql += ` ORDER BY ${sort.field} ${sort.order}`;
+    }
+    console.log(sql);   
+    // execute query
+    db.query(sql,dbParams, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+            console.log(sql); 
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results})
+            console.log(sql); 
         }
     }) 
 })
