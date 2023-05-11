@@ -33,6 +33,19 @@ router.put('/delete-size' , authenticates(['admin', 'employee']), (req, res) =>{
         }
     })
 })
+router.post('/delete-sizes/:id' , authenticates(['admin', 'employee']), (req, res) =>{
+    const id = req.params.id;
+    let sql = `DELETE FROM sizes WHERE id=` + id
+    db.query(sql, (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error deleting sizes'});
+            console.log(sql)
+        }else{
+            res.send({code: 200, message: `Deleted ${results.affectedRows} sizes`});
+            console.log(sql)
+        }
+    })
+})
 router.put('/update-size/:id' , authenticates(['admin', 'employee']), (req, res) =>{
     const size = req.body.size;
     const id = req.params.id;
