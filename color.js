@@ -72,4 +72,25 @@ router.post('/', (req, res) =>{
         }
     })
 })
+router.post('/get-color-with-filter', (req, res) =>{
+    let sql = `SELECT * FROM colors WHERE status = 1`;
+    const {filter} = req.body;
+    const dbParams = [];
+    if(filter){
+        // add search condition
+        if(filter.search){
+            const searchValue = `%${filter.search}%`;
+            sql += ` AND (name LIKE ?)`;
+            dbParams.push(searchValue);
+        }
+    }
+    db.query(sql, dbParams, (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error get colors'});
+        }else{
+            res.send({code: 200, message: `Get colors sucess`, data: results} );
+            console.log(sql);
+        }
+    })
+})
 module.exports = router;

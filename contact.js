@@ -18,6 +18,19 @@ router.post('/', (req, res) =>{
         }
     })
 })
+router.post('/get-contact-with-filter', (req, res) =>{
+    // const {contact_input} = req.body.product_input;
+    const sql = 'SELECT * FROM contacts';
+    db.query(sql, (error, results) =>{
+        if(error){
+            res.status(500).send({code: 500, message:"error get contact"})
+            console.log(sql);
+        }else{
+            res.status(200).send({code: 200, message:"success", data: results});
+            console.log(sql);
+        }
+    })
+})
 router.post('/insert-contact' , (req, res)=>{
     const {contact_input} = req.body;
     if(!contact_input){
