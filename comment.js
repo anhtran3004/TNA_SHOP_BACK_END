@@ -26,6 +26,49 @@ router.post('/', (req, res) =>{
         }
     })
 })
+router.post('/get-comment-with-filter', (req, res) =>{
+    // const {comment_input} = req.body.product_input;
+    const {filter, sort} = req.body; 
+    const dbParams = [];
+    let sql = 'SELECT comments.id, name, content, rating, comment_date, username, user_id, product_id FROM comments join products on comments.product_id = products.id';
+    if(filter){
+        if(filter.comment_date){
+            sql += ` AND comment_date BETWEEN "${filter.comment_date.min}" AND "${filter.comment_date.max}"`;
+        }
+        // add search condition
+        if(filter.search){
+            const searchValue = `%${filter.search}%`;
+            sql += ` AND (content LIKE ? OR username LIKE ? OR name LIKE ?)`;
+            dbParams.push(searchValue, searchValue, searchValue);
+        }
+    }
+    if(sort && sort.field && sort.order){
+        sql += ` ORDER BY ${sort.field} ${sort.order}`;
+    }
+    db.query(sql, dbParams, (error, results) =>{
+        if(error){
+            res.status(500).send({code: 500, message:"error get comment"})
+            console.log(sql);
+        }else{
+            res.status(200).send({code: 200, message:"success", data: results});
+            console.log(sql);
+
+        }
+    })
+})
+router.post('/get-product-comment', (req, res) =>{
+    // const {comment_input} = req.body.product_input;
+    const sql = 'SELECT products.name FROM comments join products on comments.product_id = products.id';
+    db.query(sql, (error, results) =>{
+        if(error){
+            res.status(500).send({code: 500, message:"error get comment"})
+            console.log(sql)
+        }else{
+            res.status(200).send({code: 200, message:"success", data: results});
+            console.log(sql)
+        }
+    })
+})
 router.post('/get-child-comment', (req, res) =>{
     // const {comment_input} = req.body.product_input;
     const {comment_id} = req.body.comment_id
@@ -46,9 +89,10 @@ router.post('/get-child-comments/:id', (req, res) =>{
     db.query(sql, (error, results) =>{
         if(error){
             res.status(500).send({code: 500, message:"error get comment"});
+            console.log(sql)
         }else{
             res.status(200).send({code: 200, message:"success", data: results});
-
+            console.log(sql)
         }
     })
 })
