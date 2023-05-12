@@ -72,4 +72,25 @@ router.post('/' , authenticates(['admin', 'employee']), (req, res) =>{
         }
     })
 })
+router.post('/get-size-with-filter' , authenticates(['admin', 'employee']), (req, res) =>{
+    let sql = `SELECT * FROM  sizes WHERE status = 1`;
+    const {filter} = req.body; 
+    const dbParams = [];
+    if(filter){
+        // add search condition
+        if(filter.search){
+            const searchValue = `%${filter.search}%`;
+            sql += ` AND (size LIKE ?)`;
+            dbParams.push(searchValue);
+        }
+    }
+    db.query(sql, dbParams, (error, results) => {
+        if(error){
+            res.status(500).send({code: 500, message:'Error get sizes'});
+        }else{
+            res.send({code: 200, message: `Get sizes sucess`, data: results} );
+            console.log(sql);
+        }
+    })
+})
 module.exports = router;
