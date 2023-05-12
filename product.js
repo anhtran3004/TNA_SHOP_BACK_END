@@ -65,6 +65,57 @@ router.post('/', (req, res) =>{
         }
     }) 
 })
+router.post('/get-product-admin', (req, res) =>{
+    const {filter, sort, pagination} = req.body;
+    let sql = 'SELECT * FROM products WHERE 1=1';
+    const dbParams = [];
+
+    // apply filters    
+    if(filter){
+        // if(filter.gender_type){
+        //     sql += ` WHERE gender_type = '${filter.gender_type}'`
+        // }
+        if(filter.category_id && filter.category_id.length > 0){
+            sql += ` AND category_id IN (${filter.category_id.join()})`;
+        }
+        if(filter.campaign_id && filter.campaign_id.length > 0){
+            sql += ` AND campaign_id IN (${filter.campaign_id.join()})`;
+        }
+        if(filter.product_id && filter.product_id.length > 0){
+            sql += ` AND id IN (${filter.product_id.join()})`;
+        }
+        if(filter.price){
+            sql += ` AND price BETWEEN ${filter.price.min} AND ${filter.price.max}`;
+            
+        }
+        if(filter.import_date){
+            sql += ` AND import_date BETWEEN "${filter.import_date.min}" AND "${filter.import_date.max}"`;
+            
+        }
+        // add search condition
+        if(filter.search){
+            const searchValue = `%${filter.search}%`;
+            sql += ` AND (name LIKE ? OR description LIKE ?)`;
+            dbParams.push(searchValue, searchValue);
+        }
+    }
+    if(sort && sort.field && sort.order){
+        sql += ` ORDER BY ${sort.field} ${sort.order}`;
+    }
+    const page = (pagination && pagination.page) ? pagination.page : 0;
+    const perPage = (pagination && pagination.perPage) ? pagination.perPage : 10000;
+    const startIndex = page * perPage;
+    sql += ` LIMIT ${startIndex}, ${perPage}`;
+    db.query(sql,dbParams, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching products form database'});
+            console.log(sql);
+        }else{
+            res.status(200).send({code: 200, message: "success!", data: results});
+            console.log(sql);
+        }
+    }) 
+})
 router.post('/insert-product' , authenticates(['admin', 'employee']), (req, res) =>{
     const {product_input} = req.body; 
     let sql = 'INSERT INTO products (name, price, sku, description, thumb, category_id, hot, discount_id, campaign_id, import_date, update_date, priority) VALUES';
@@ -254,5 +305,18 @@ router.put('/update-quantity-order/:id', (req, res) =>{
             
         }
     }) 
+})
+router.put('/delete-products' , authenticates(['admin', 'employee']), (req, res) =>{
+    const id = req.body.id;
+    const status = req.body.status;
+    const sql = 'UPDATE products SET status = ? WHERE id = ?';
+    console.log(sql);
+    db.query(sql,[status, id], (error, results) =>{
+        if(error){
+            res.status(500).send({code: 500, message:"error delete category"})
+        }else{
+            res.status(200).send({code: 200, message:"insert success!"})
+        }
+    })
 })
 module.exports = router;
