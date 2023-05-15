@@ -36,6 +36,22 @@ router.post('/insert-order-product', (req, res) =>{
         }
     }) 
 })
+router.post('/update-order-product/:id', (req, res) =>{
+    const id = req.params.id;
+    let sql = 'UPDATE  orders SET shipped_date = "' + formatDate() + '" WHERE id = ' + id;
+    // console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+            console.log(sql)
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!'})
+            console.log(sql)
+        }
+    }) 
+})
 router.post('/get-order-follow-user/:id', (req, res) =>{
     const {status} = req.body;
     const userId = req.params.id;
