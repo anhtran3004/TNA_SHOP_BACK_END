@@ -21,7 +21,7 @@ router.post('/insert-user',async (req, res)=>{
 });
 router.post('/insert-user-by-admin',authenticate('admin'), async (req, res)=>{
     const {user_input} = req.body;
-        const result = await createUser(user_input.username, user_input.email, user_input.password, user_input.name, user_input.phone, user_input.address, formatDate(), user_input.role);
+        const result = await createUser(user_input.username, user_input.email, user_input.password, user_input.name, user_input.phone, user_input.address, formatDate(), 'employee');
         console.log('result', result);
         res.status(200).send({code: 200, message:"insert size sucess", data: result});
 });
