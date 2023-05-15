@@ -7,7 +7,7 @@ function createUser(username, email, password, fullname, phone, address, created
       if (err) return reject(err);
       db.query(
         'INSERT INTO users (username, email, password, name, phone, address, created_date, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [username,email, hashedPassword, fullname, phone, address, created_date, 'employee'],
+        [username,email, hashedPassword, fullname, phone, address, created_date, role],
         (error, results, fields) => {
           if (error) return reject(error);
           return resolve({code: 200, message:"insert size sucess", data: results});
