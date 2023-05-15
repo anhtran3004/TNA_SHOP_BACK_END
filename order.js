@@ -75,7 +75,20 @@ router.post('/', (req, res) =>{
     let sql = 'SELECT * FROM orders WHERE status='+ status + ' ORDER BY created_date DESC';
     console.log(sql);   
     // execute query
-    db.query(sql,dbParams, (error,  results) => {
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results})
+        }
+    }) 
+})
+router.post('/get-list-order', (req, res) =>{
+    let sql = 'SELECT * FROM orders';
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
         if(error){
             res.status(500).send({error: 'Error fetching orders form database'});
         }else{
