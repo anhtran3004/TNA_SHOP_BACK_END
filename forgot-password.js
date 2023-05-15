@@ -10,16 +10,6 @@ const moment = require('moment');
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
-//Tạo mã OTP với speakeasy
-// function generateOTP(){
-//     const serect = speakeasy.generateSecret({length: 20});
-//     const token = speakeasy.totp({
-//             serect: serect.base32,
-//             encoding: 'base32',
-//     })
-//     return {serect: serect.base32, token};
-// }
-//Lưu trữ mã OTP và email
 // const otpStore = {};
 //Gửi eamil chứa mã OTP
 async function sendOTP(email, otp){
@@ -28,9 +18,7 @@ async function sendOTP(email, otp){
             service: 'gmail',
             auth: {
                 user: 'tranngocanh2192001@gmail.com',
-                pass: 'jiajtpkvhxcbfvhd',
-                
-               
+                pass: 'jiajtpkvhxcbfvhd',   
             },
         });
         const mailOptions = {
