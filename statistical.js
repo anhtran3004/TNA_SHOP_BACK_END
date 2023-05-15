@@ -82,7 +82,7 @@ router.post('/get-new-users-follow-month/',authenticates(['admin', 'employee']),
     }) 
 })
 router.post('/get-hot-product-list/', authenticates(['admin', 'employee']), (req, res) =>{
-    let sql = 'SELECT product_id, name, SUM(quantity) AS total FROM order_products GROUP BY product_id, name order by total DESC';
+    let sql = 'SELECT product_id, order_products.name, SUM(quantity) AS total FROM order_products join orders on orders.id = order_products.order_id WHERE month(created_date) = month(now()) GROUP BY product_id, order_products.name order by total DESC LIMIT 0, 20';
     console.log(sql);   
     // execute query
     db.query(sql, (error,  results) => {
