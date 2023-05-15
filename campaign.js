@@ -110,5 +110,16 @@ router.put('/delete-campaign', authenticates(['admin', 'employee']), (req, res) 
         }
     })
 })
+router.post('/expired-campaign/:id', (req, res) => {
+    const campaignId = parseInt(req.params.id);
+    const sql = 'SELECT * FROM campaigns WHERE status = 1';
+    db.query(sql, (error, results) =>{
+        if(error){
+            res.status(500).send({code: 500, message:"error get campaigns"})
+        }else{
+            res.status(200).send({code: 200, message:"success", data: results});
+        }
+    })
+})
 
 module.exports = router;
