@@ -52,6 +52,23 @@ router.post('/update-order-product/:id', (req, res) =>{
         }
     }) 
 })
+router.post('/update-reason-remove/:id', (req, res) =>{
+    const id = req.params.id;
+    const reason = req.body.reason
+    let sql = 'UPDATE  orders SET reason_remove = "' + reason + '" WHERE id = ' + id;
+    // console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+            console.log(sql)
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!'})
+            console.log(sql)
+        }
+    }) 
+})
 router.post('/get-order-follow-user/:id', (req, res) =>{
     const {status} = req.body;
     const userId = req.params.id;
@@ -73,6 +90,20 @@ router.post('/get-order-follow-user/:id', (req, res) =>{
 router.post('/', (req, res) =>{
     const {status} = req.body
     let sql = 'SELECT * FROM orders WHERE status='+ status + ' ORDER BY created_date DESC';
+    console.log(sql);   
+    // execute query
+    db.query(sql, (error,  results) => {
+        if(error){
+            res.status(500).send({error: 'Error fetching orders form database'});
+        }else{
+            // res.send(results);
+            res.status(200).send({code: 200, message:'success!', data: results})
+        }
+    }) 
+})
+router.post('/get-reason/:id', (req, res) =>{
+    const id = req.params.id;
+    let sql = 'SELECT reason_remove FROM orders WHERE id = ' + id;
     console.log(sql);   
     // execute query
     db.query(sql, (error,  results) => {
